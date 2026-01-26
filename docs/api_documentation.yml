@@ -50,7 +50,6 @@ components:
         updated_at:
           type: string
           format: date-time
-
     ProductImage:
       type: object
       properties:
@@ -66,7 +65,6 @@ components:
         created_at:
           type: string
           format: date-time
-
     Category:
       type: object
       properties:
@@ -78,7 +76,6 @@ components:
         created_at:
           type: string
           format: date-time
-
     PaginatedProducts:
       type: object
       properties:
@@ -112,6 +109,50 @@ components:
             details:
               type: object
               nullable: true
+
+    ProductUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+        price:
+          type: number
+          format: double
+          minimum: 0
+        category_id:
+          type: integer
+          format: int64
+        available:
+          type: boolean
+    ProductCreateRequest:
+      type: object
+      required:
+        - name
+        - price
+        - category_id
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+        price:
+          type: number
+          format: double
+          minimum: 0
+        category_id:
+          type: integer
+          format: int64
+        available:
+          type: boolean
+          default: true
 
   responses:
     UnauthorizedError:
@@ -276,6 +317,203 @@ paths:
                 $ref: '#/components/schemas/Product'
         '404':
           $ref: '#/components/responses/NotFoundError'
+
+
+  # Manager-Only
+  /manager/products:
+    post:
+      tags:
+        - Manager
+      summary: Create a new product
+      operationId: createProduct
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductCreateRequest'
+      responses:
+        '201':
+          description: Product created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /manager/products/{productId}:
+    put:
+      tags:
+        - Manager
+      summary: Update product
+      operationId: updateProduct
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: Product ID to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductUpdateRequest'
+      responses:
+        '200':
+          description: Product updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+    delete:
+      tags:
+        - Manager
+      summary: Delete product
+      description: Permanently delete a product. Manager role required.
+      operationId: deleteProduct
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: Product ID to delete
+      responses:
+        '204':
+          description: Product deleted successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /manager/products/{productId}/disable:
+    put:
+      tags:
+        - Manager
+      summary: Disable product
+      description: Disable a product without deleting it. Manager role required.
+      operationId: disableProduct
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: Product ID to disable
+      responses:
+        '200':
+          description: Product disabled successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /manager/products/{productId}/images:
+    post:
+      tags:
+        - Manager
+      summary: Upload product image
+      operationId: uploadProductImage
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: Product ID
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - image
+                - order
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: Image file (JPEG, PNG, WebP)
+                order:
+                  type: integer
+                  minimum: 0
+                  description: Display order of the image
+      responses:
+        '201':
+          description: Image uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductImage'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /manager/products/{productId}/images/{imageId}:
+    delete:
+      tags:
+        - Manager
+      summary: Delete product image
+      operationId: deleteProductImage
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: imageId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Image deleted successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
 
 security:
   - bearerAuth: []
