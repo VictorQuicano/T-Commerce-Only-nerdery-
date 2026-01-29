@@ -56,6 +56,11 @@ components:
           minLength: 8
           pattern: '(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])'
           description: Must contain uppercase, lowercase, number and special character
+        password_confirmation:
+          type: string
+          minLength: 8
+          pattern: '(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])'
+          description: Must contain uppercase, lowercase, number and special character and be equals to the
 
     SignInRequest:
       type: object
@@ -641,6 +646,50 @@ paths:
                 $ref: '#/components/schemas/SuccessResponse'
         '400':
           $ref: '#/components/responses/ValidationError'
+  /auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh access token
+      description: |
+        Generates a new access token using a valid refresh token.
+        If refresh token rotation is enabled, a new refresh token will also be issued.
+      operationId: refreshToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - refreshToken
+              properties:
+                refreshToken:
+                  type: string
+                  description: Valid refresh token previously issued by the authentication server.
+                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.refresh.token
+      responses:
+        '200':
+          description: Tokens successfully refreshed.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    description: Newly generated JWT access token.
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.access.token
+                  refreshToken:
+                    type: string
+                    description: New refresh token (returned if rotation is enabled).
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.new.refresh.token
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
 
   # Products Endpoints
   /categories:
