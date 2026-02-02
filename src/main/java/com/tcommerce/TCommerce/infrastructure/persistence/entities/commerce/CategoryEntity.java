@@ -10,16 +10,16 @@ import java.util.List;
 @Entity
 @Table(name = "categories",
         uniqueConstraints = @UniqueConstraint(name = "uq_category_name", columnNames = "name"))
-public class Category extends BaseEntity {
+public class CategoryEntity extends BaseEntity {
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Product> products = new ArrayList<>();
+    private List<ProductEntity> products = new ArrayList<>();
 
 
-    protected Category() {}
-    public Category(String id, String name, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    protected CategoryEntity() {}
+    public CategoryEntity(String id, String name, LocalDateTime createdAt, LocalDateTime updatedAt) {
         super(id, createdAt, updatedAt);
         this.name = name;
     }
@@ -32,11 +32,11 @@ public class Category extends BaseEntity {
         this.name = name;
     }
 
-    public List<Product> getProducts() {
+    public List<ProductEntity> getProducts() {
         return products;
     }
 
-    public void setProducts(List<Product> products) {
+    public void setProducts(List<ProductEntity> products) {
         this.products = products;
     }
 }

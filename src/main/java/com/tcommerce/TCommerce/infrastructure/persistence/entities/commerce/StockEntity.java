@@ -7,17 +7,17 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name="stock_levels")
-public class Stock extends BaseEntity {
+public class StockEntity extends BaseEntity {
     @Column
     private int quantity;
 
     @OneToOne
     @JoinColumn(name = "product_id", unique = true)
-    private Product product;
+    private ProductEntity product;
 
-    public Stock(){}
+    public StockEntity(){}
 
-    public Stock(String id, LocalDateTime createdAt, LocalDateTime updatedAt, int quantity) {
+    public StockEntity(String id, LocalDateTime createdAt, LocalDateTime updatedAt, int quantity) {
         super(id, createdAt, updatedAt);
         this.quantity = quantity;
     }
@@ -30,11 +30,11 @@ public class Stock extends BaseEntity {
         this.quantity = quantity;
     }
 
-    public Product getProduct() {
+    public ProductEntity getProduct() {
         return product;
     }
 
-    public void setProduct(Product product) {
+    public void setProduct(ProductEntity product) {
         this.product = product;
     }
 }

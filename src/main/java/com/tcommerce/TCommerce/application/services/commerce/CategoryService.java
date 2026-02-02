@@ -1,4 +1,4 @@
-package com.tcommerce.TCommerce.application.services;
+package com.tcommerce.TCommerce.application.services.commerce;
 
 import com.tcommerce.TCommerce.domain.entities.commerce.Category;
 import com.tcommerce.TCommerce.domain.repositories.interfaces.commerce.CategoryRepository;

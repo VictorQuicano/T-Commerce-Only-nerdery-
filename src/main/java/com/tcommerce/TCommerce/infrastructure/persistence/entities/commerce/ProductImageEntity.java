@@ -6,27 +6,27 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name="product_images")
-public class ProductImage extends BaseEntity {
+public class ProductImageEntity extends BaseEntity {
     @Column(name="imageUrl", nullable = false)
     private String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    private ProductEntity product;
 
     @Column(name = "display_order")
     private int displayOrder;
 
-    public ProductImage() {
+    public ProductImageEntity() {
     }
 
-    public ProductImage(String imageUrl, Product product, int displayOrder) {
+    public ProductImageEntity(String imageUrl, ProductEntity product, int displayOrder) {
         this.imageUrl = imageUrl;
         this.product = product;
         this.displayOrder = displayOrder;
     }
 
-    public ProductImage(String id, LocalDateTime createdAt, LocalDateTime updatedAt, String imageUrl, Product product, int displayOrder) {
+    public ProductImageEntity(String id, LocalDateTime createdAt, LocalDateTime updatedAt, String imageUrl, ProductEntity product, int displayOrder) {
         super(id, createdAt, updatedAt);
         this.imageUrl = imageUrl;
         this.product = product;

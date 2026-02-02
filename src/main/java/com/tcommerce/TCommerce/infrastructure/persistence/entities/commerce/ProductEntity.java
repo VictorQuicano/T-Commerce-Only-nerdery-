@@ -8,7 +8,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "products")
-public class Product extends BaseEntity {
+public class ProductEntity extends BaseEntity {
     @Column(nullable = false, length = 255)
     private String name;
 
@@ -20,27 +20,27 @@ public class Product extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
+    private CategoryEntity category;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProductImage> images;
+    private List<ProductImageEntity> images;
 
     @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Stock stock;
+    private StockEntity stock;
 
     @Column(name="deleted_at")
     private LocalDateTime deletedAt;
 
-    protected Product() {}
+    protected ProductEntity() {}
 
-    public Product(String id, String name, String description, BigDecimal price, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime deletedAt) {
+    public ProductEntity(String id, String name, String description, BigDecimal price, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime deletedAt) {
         super(id, createdAt, updatedAt);
         this.name = name;
         this.description = description;
         this.price = price;
     }
 
-    public Product(String id, String name, String description, BigDecimal price, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime deletedAt, Category category) {
+    public ProductEntity(String id, String name, String description, BigDecimal price, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime deletedAt, CategoryEntity category) {
         super(id, createdAt, updatedAt);
         this.name = name;
         this.description = description;
@@ -81,26 +81,26 @@ public class Product extends BaseEntity {
         this.deletedAt = deletedAt;
     }
 
-    public Category getCategory() {
+    public CategoryEntity getCategory() {
         return category;
     }
 
-    public void setCategory(Category category) {
+    public void setCategory(CategoryEntity category) {
         this.category = category;
     }
 
-    public List<ProductImage> getImages() {
+    public List<ProductImageEntity> getImages() {
         return images;
     }
 
-    public void setImages(List<ProductImage> images) {
+    public void setImages(List<ProductImageEntity> images) {
         this.images = images;
     }
-    public Stock getStock() {
+    public StockEntity getStock() {
         return stock;
     }
 
-    public void setStock(Stock stock) {
+    public void setStock(StockEntity stock) {
         this.stock = stock;
     }
 
