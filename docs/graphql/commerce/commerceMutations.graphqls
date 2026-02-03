@@ -1,0 +1,53 @@
+scalar Upload
+extend type Mutation {
+    createProduct(input: CreateProductInput!): Product!
+    updateProduct(id: ID!, input: UpdateProductInput!): Product!
+    deleteProduct(id: ID!): Boolean!
+    toggleProductStatus(id: ID!, isActive: Boolean!): Product!
+    updateStock(id: ID!, stock: Int!): Product!
+
+    # Product Image mutations
+    uploadProductImage(
+        productId: ID!
+        file: Upload!
+        order: Int
+    ): ProductImage!
+
+    deleteProductImage(id: ID!): Boolean!
+    setPrimaryImage(productId: ID!, imageId: ID!): Product!
+
+    # Category mutations (Manager only)
+    createCategory(input: CreateCategoryInput!): Category!
+    updateCategory(id: ID!, input: UpdateCategoryInput!): Category!
+
+}
+# ===========================================================
+# 💫 Mutations Inputs (This emoji was put in by an IA or no?)
+# ===========================================================
+
+input CreateProductInput {
+    name: String!
+    description: String
+    price: Float!
+    categoryId: ID!
+    stock: Int!
+    images: [Upload!]
+}
+
+input UpdateProductInput {
+    id: ID!
+    name: String
+    description: String
+    price: Float
+    categoryId: ID
+    stock: Int
+}
+
+input CreateCategoryInput {
+    name: String!
+}
+
+input UpdateCategoryInput {
+    id: ID!
+    name: String
+}

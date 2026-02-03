@@ -1,0 +1,42 @@
+extend type Mutation {
+    signUp(input: SignUpInput!): AuthPayload!
+    login(input: LoginInput!): AuthPayload!
+    forgotPassword(email: String!): ForgotPasswordPayload!
+    resetPassword(input: ResetPasswordInput!): ResetPasswordPayload!
+}
+
+type AuthPayload {
+    user: User!
+    access_token: String!
+    refresh_token: String!
+}
+
+
+type ForgotPasswordPayload {
+    success: Boolean!
+    message: String!
+}
+
+type ResetPasswordPayload {
+    success: Boolean!
+}
+
+input SignUpInput {
+    email: String!
+    password: String!
+    passwordConfirmation: String!
+    firstName: String!
+    middleName: String
+    lastName: String!
+}
+
+input LoginInput {
+    email: String!
+    password: String!
+}
+
+input ResetPasswordInput {
+    token: String!
+    newPassword: String!
+    newPasswordConfirmation: String!
+}

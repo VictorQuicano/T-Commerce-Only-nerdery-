@@ -1,0 +1,23 @@
+type Permission implements Node {
+  id: ID!
+  name: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+type Role implements Node {
+  id: ID!
+  name: String!
+  permissions: [Permission!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+type User implements Node {
+  id: ID!
+  email: String!
+  firstName: String!
+  middleName: String
+  lastName: String!
+  role: Role!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}

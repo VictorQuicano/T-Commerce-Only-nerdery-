@@ -1,0 +1,45 @@
+
+
+type Category implements Node {
+  id: ID!
+  name: String
+  products: [Product!]!
+
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type ProductImage implements Node {
+  id: ID!
+  imageUrl: String
+  order: Int!
+
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type StockLevel implements Node {
+  id: ID!
+
+  productId: ID!
+  quantity: Int!
+
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Product implements Node {
+  id: ID!
+  name: String!
+  description: String!
+  price: Float!
+  category: Category!
+  categoryId: ID!
+  images: [ProductImage!]!
+  stockLevel: StockLevel!
+  isLiked: Boolean!
+  deletedAt: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
