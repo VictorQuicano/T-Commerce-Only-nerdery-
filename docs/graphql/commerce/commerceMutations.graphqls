@@ -1,53 +1,48 @@
 scalar Upload
 extend type Mutation {
-    createProduct(input: CreateProductInput!): Product!
-    updateProduct(id: ID!, input: UpdateProductInput!): Product!
-    deleteProduct(id: ID!): Boolean!
-    toggleProductStatus(id: ID!, isActive: Boolean!): Product!
-    updateStock(id: ID!, stock: Int!): Product!
+  createProduct(input: CreateProductInput!): Product!
+  updateProduct(id: ID!, input: UpdateProductInput!): Product!
+  deleteProduct(id: ID!): Boolean!
+  toggleProductStatus(id: ID!, isActive: Boolean!): Product!
+  updateStock(id: ID!, stock: Int!): Product!
+  toggleProductLike(id: ID!): Product!
 
-    # Product Image mutations
-    uploadProductImage(
-        productId: ID!
-        file: Upload!
-        order: Int
-    ): ProductImage!
+  # Product Image mutations
+  uploadProductImage(productId: ID!, file: Upload!, order: Int): ProductImage!
 
-    deleteProductImage(id: ID!): Boolean!
-    setPrimaryImage(productId: ID!, imageId: ID!): Product!
+  deleteProductImage(id: ID!): Boolean!
 
-    # Category mutations (Manager only)
-    createCategory(input: CreateCategoryInput!): Category!
-    updateCategory(id: ID!, input: UpdateCategoryInput!): Category!
-
+  # Category mutations (Manager only)
+  createCategory(input: CreateCategoryInput!): Category!
+  updateCategory(id: ID!, input: UpdateCategoryInput!): Category!
 }
 # ===========================================================
 # 💫 Mutations Inputs (This emoji was put in by an IA or no?)
 # ===========================================================
 
 input CreateProductInput {
-    name: String!
-    description: String
-    price: Float!
-    categoryId: ID!
-    stock: Int!
-    images: [Upload!]
+  name: String!
+  description: String
+  price: Float!
+  categoryId: ID!
+  stock: Int!
+  images: [Upload!]
 }
 
 input UpdateProductInput {
-    id: ID!
-    name: String
-    description: String
-    price: Float
-    categoryId: ID
-    stock: Int
+  id: ID!
+  name: String
+  description: String
+  price: Float
+  categoryId: ID
+  stock: Int
 }
 
 input CreateCategoryInput {
-    name: String!
+  name: String!
 }
 
 input UpdateCategoryInput {
-    id: ID!
-    name: String
+  id: ID!
+  name: String
 }
