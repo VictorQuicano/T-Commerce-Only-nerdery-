@@ -105,8 +105,7 @@ components:
         refresh_token:
           type: string
         user:
-          $ref: '#/components/schemas/User'
-
+          $ref: "#/components/schemas/User"
 
     # User Schemas
     User:
@@ -126,7 +125,7 @@ components:
           type: string
           format: email
         role:
-          $ref: '#/components/schemas/Role'
+          $ref: "#/components/schemas/Role"
         created_at:
           type: string
           format: date-time
@@ -144,6 +143,22 @@ components:
         email:
           type: string
           format: email
+    UpdateClientProfile:
+      type: object
+      properties:
+        first_name:
+          type: string
+        middle_name:
+          type: string
+          nullable: true
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        roleId:
+          type: integer
+          format: int64
     DeleteAccountRequest:
       type: object
       required:
@@ -180,6 +195,26 @@ components:
           format: int64
         name:
           type: string
+    PaginatedClients:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+        pagination:
+          type: object
+          properties:
+            page:
+              type: integer
+              minimum: 1
+            per_page:
+              type: integer
+              minimum: 1
+            total:
+              type: integer
+            total_pages:
+              type: integer
 
     # Product Schemas
     Product:
@@ -200,11 +235,11 @@ components:
         available:
           type: boolean
         category:
-          $ref: '#/components/schemas/Category'
+          $ref: "#/components/schemas/Category"
         images:
           type: array
           items:
-            $ref: '#/components/schemas/ProductImage'
+            $ref: "#/components/schemas/ProductImage"
         liked_by_user:
           type: boolean
           description: Only present for authenticated requests
@@ -289,14 +324,13 @@ components:
         name:
           type: string
 
-
     PaginatedProducts:
       type: object
       properties:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/Product'
+            $ref: "#/components/schemas/Product"
         pagination:
           type: object
           properties:
@@ -319,7 +353,7 @@ components:
           type: integer
           format: int64
         product:
-          $ref: '#/components/schemas/Product'
+          $ref: "#/components/schemas/Product"
         quantity:
           type: integer
           minimum: 1
@@ -336,7 +370,7 @@ components:
         items:
           type: array
           items:
-            $ref: '#/components/schemas/CartItem'
+            $ref: "#/components/schemas/CartItem"
         total:
           type: number
           format: double
@@ -374,7 +408,7 @@ components:
           type: integer
           format: int64
         product:
-          $ref: '#/components/schemas/Product'
+          $ref: "#/components/schemas/Product"
         quantity:
           type: integer
         price:
@@ -391,19 +425,19 @@ components:
           type: integer
           format: int64
         user:
-          $ref: '#/components/schemas/User'
+          $ref: "#/components/schemas/User"
         status:
           type: string
           enum: [PENDING, PAID, CANCELLED, SHIPPED, DELIVERED]
         items:
           type: array
           items:
-            $ref: '#/components/schemas/OrderItem'
+            $ref: "#/components/schemas/OrderItem"
         total_amount:
           type: number
           format: double
         payment:
-          $ref: '#/components/schemas/Payment'
+          $ref: "#/components/schemas/Payment"
           nullable: true
 
     CreateOrderRequest:
@@ -433,7 +467,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/Order'
+            $ref: "#/components/schemas/Order"
         pagination:
           type: object
           properties:
@@ -468,7 +502,7 @@ components:
           type: string
           nullable: true
         payment_intent:
-          $ref: '#/components/schemas/PaymentIntent'
+          $ref: "#/components/schemas/PaymentIntent"
           nullable: true
         paid_at:
           type: string
@@ -488,7 +522,15 @@ components:
           type: string
         status:
           type: string
-          enum: [REQUIRES_PAYMENT_METHOD, REQUIRES_CONFIRMATION, REQUIRES_ACTION, PROCESSING, SUCCESS, CANCELED]
+          enum:
+            [
+              REQUIRES_PAYMENT_METHOD,
+              REQUIRES_CONFIRMATION,
+              REQUIRES_ACTION,
+              PROCESSING,
+              SUCCESS,
+              CANCELED,
+            ]
 
     CreatePaymentRequest:
       type: object
@@ -547,59 +589,61 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
 
     ForbiddenError:
       description: User lacks required permissions
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
 
     NotFoundError:
       description: Resource not found
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
 
     ConflictError:
       description: Resource already exists
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
 
     ValidationError:
       description: Request validation failed
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
 
 paths:
   # Authentication Endpoints
-  /auth/sign-up:
+  /users:
     post:
       tags:
         - Authentication
+      summary: Create user
+      description: Creates a new user account with the provided registration data.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SignUpRequest'
+              $ref: "#/components/schemas/SignUpRequest"
       responses:
-        '201':
+        "201":
           description: User registered successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthResponse'
-        '400':
-          $ref: '#/components/responses/ValidationError'
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
 
-  /auth/sign-in:
+  /sessions:
     post:
       tags:
         - Authentication
@@ -611,21 +655,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SignInRequest'
+              $ref: "#/components/schemas/SignInRequest"
       responses:
-        '200':
+        "200":
           description: Authentication successful
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthResponse'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-
-  /auth/sign-out:
-    post:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+    delete:
       tags:
         - Authentication
       summary: Sign out user
@@ -634,16 +676,16 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: Sign out successful
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+                $ref: "#/components/schemas/SuccessResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
-  /auth/forgot-password:
+  /password-resets:
     post:
       tags:
         - Authentication
@@ -655,40 +697,48 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ForgotPasswordRequest'
+              $ref: "#/components/schemas/ForgotPasswordRequest"
       responses:
-        '200':
+        "200":
           description: Reset email sent successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
-        '400':
-          $ref: '#/components/responses/ValidationError'
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
 
-  /auth/reset-password:
-    post:
+  /password-resets/{token}:
+    put:
       tags:
         - Authentication
       summary: Reset password
-      description: Reset user password using token from email
+      description: Resets a user's password using a valid password reset token.
       operationId: resetPassword
+      parameters:
+        - name: token
+          in: path
+          required: true
+          description: Password reset token sent via email
+          schema:
+            type: string
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ResetPasswordRequest'
+              $ref: "#/components/schemas/ResetPasswordRequest"
       responses:
-        '200':
+        "204":
           description: Password reset successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessResponse'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-  /auth/refresh:
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "404":
+          description: Password reset token not found
+        "410":
+          description: Password reset token has expired
+
+  /sessions/refresh:
     post:
       tags:
         - Authentication
@@ -711,7 +761,7 @@ paths:
                   description: Valid refresh token previously issued by the authentication server.
                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.refresh.token
       responses:
-        '200':
+        "200":
           description: Tokens successfully refreshed.
           content:
             application/json:
@@ -726,13 +776,12 @@ paths:
                     type: string
                     description: New refresh token (returned if rotation is enabled).
                     example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.new.refresh.token
-        '404':
-          $ref: '#/components/responses/NotFoundError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
 
   # User Endpoints
   /me:
@@ -744,7 +793,7 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: User profile retrieved successfully
           content:
             application/json:
@@ -752,9 +801,9 @@ paths:
                 type: object
                 properties:
                   data:
-                    $ref: '#/components/schemas/User'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+                    $ref: "#/components/schemas/User"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
     patch:
       tags:
@@ -768,9 +817,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateUserProfileRequest'
+              $ref: "#/components/schemas/UpdateUserProfileRequest"
       responses:
-        '200':
+        "200":
           description: User profile updated successfully
           content:
             application/json:
@@ -779,13 +828,13 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: 'User profile updated successfully'
+                    example: "User profile updated successfully"
                   data:
-                    $ref: '#/components/schemas/User'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+                    $ref: "#/components/schemas/User"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
     delete:
       tags:
@@ -799,9 +848,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DeleteAccountRequest'
+              $ref: "#/components/schemas/DeleteAccountRequest"
       responses:
-        '200':
+        "204":
           description: Account deleted successfully
           content:
             application/json:
@@ -810,11 +859,11 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: 'Account deleted successfully'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+                    example: "Account deleted successfully"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
   /me/change-password:
     post:
@@ -829,9 +878,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ChangePasswordRequest'
+              $ref: "#/components/schemas/ChangePasswordRequest"
       responses:
-        '200':
+        "200":
           description: Password changed successfully
           content:
             application/json:
@@ -840,32 +889,28 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: 'Password changed successfully'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-
-
-
-
+                    example: "Password changed successfully"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
   # Products Endpoints
   /categories:
     get:
       tags:
         - Products
-      summary: List all the products
+      summary: List all the categories
       operationId: listCategories
       responses:
-        '200':
+        "200":
           description: Products retrieved successfully
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Category'
+                  $ref: "#/components/schemas/Category"
 
   /products:
     get:
@@ -930,12 +975,12 @@ paths:
             minimum: 0
           description: Maximum price filter
       responses:
-        '200':
+        "200":
           description: Products retrieved successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedProducts'
+                $ref: "#/components/schemas/PaginatedProducts"
 
   /products/{productId}:
     get:
@@ -953,14 +998,14 @@ paths:
             format: int64
           description: Product ID
       responses:
-        '200':
+        "200":
           description: Product details retrieved successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Product'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
+                $ref: "#/components/schemas/Product"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
 
   # Manager-Only: Product Management
   /manager/categories:
@@ -977,20 +1022,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CategoryCreateRequest'
+              $ref: "#/components/schemas/CategoryCreateRequest"
       responses:
-        '201':
+        "201":
           description: Product created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Product'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
+                $ref: "#/components/schemas/Product"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
   /manager/products:
     post:
       tags:
@@ -1005,20 +1050,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ProductCreateRequest'
+              $ref: "#/components/schemas/ProductCreateRequest"
       responses:
-        '201':
+        "201":
           description: Product created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Product'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
+                $ref: "#/components/schemas/Product"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
 
   /manager/products/{productId}:
     patch:
@@ -1042,22 +1087,22 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ProductUpdateRequest'
+              $ref: "#/components/schemas/ProductUpdateRequest"
       responses:
-        '200':
+        "200":
           description: Product updated successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Product'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
+                $ref: "#/components/schemas/Product"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
 
     delete:
       tags:
@@ -1076,14 +1121,14 @@ paths:
             format: int64
           description: Product ID to delete
       responses:
-        '204':
+        "204":
           description: Product deleted successfully
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
 
   /manager/products/{productId}/images:
     post:
@@ -1121,20 +1166,20 @@ paths:
                   minimum: 0
                   description: Display order of the image
       responses:
-        '201':
+        "201":
           description: Image uploaded successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProductImage'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
+                $ref: "#/components/schemas/ProductImage"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
 
   /manager/products/{productId}/images/{imageId}:
     delete:
@@ -1159,19 +1204,19 @@ paths:
             type: integer
             format: int64
       responses:
-        '204':
+        "204":
           description: Image deleted successfully
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
 
   /manager/orders:
     get:
       tags:
-        - Manager
+        - Mananager (Orders)
       summary: View all client orders
       description: Retrieve all orders from all clients with pagination. Manager role required.
       operationId: getManagerOrders
@@ -1204,21 +1249,21 @@ paths:
             format: int64
           description: Filter by specific user
       responses:
-        '200':
+        "200":
           description: Orders retrieved successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedOrders'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
+                $ref: "#/components/schemas/PaginatedOrders"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
 
   /manager/clients:
     get:
       tags:
-        - Manager
+        - Mananager (Clients)
       summary: View all clients
       description: Retrieve a paginated list of clients. Supports filtering by first name. Manager role required.
       operationId: managerGetClients
@@ -1249,13 +1294,47 @@ paths:
             type: string
 
       responses:
-        '200':
+        "200":
           description: List of clients
           content:
             application/json:
               schema:
-                type:
+                $ref: "#/components/schemas/PaginatedClients"
 
+  /manager/clients/{clientId}:
+    patch:
+      tags:
+        - Mananager (Clients)
+      summary: Update user profile
+      description: Updates the profile information of an existing user. This operation requires manager privileges.
+      operationId: updateUserProfile
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: clientId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateClientProfile"
+      responses:
+        "200":
+          description: User profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          description: User not found
 
   # Cart Endpoints - Client
   /cart:
@@ -1268,14 +1347,14 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: Cart retrieved successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Cart'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+                $ref: "#/components/schemas/Cart"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
   /cart/items:
     post:
@@ -1291,20 +1370,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AddToCartRequest'
+              $ref: "#/components/schemas/AddToCartRequest"
       responses:
-        '201':
+        "201":
           description: Item added to cart successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Cart'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
+                $ref: "#/components/schemas/Cart"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
 
   /cart/items/{cartItemId}:
     put:
@@ -1328,20 +1407,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateCartItemRequest'
+              $ref: "#/components/schemas/UpdateCartItemRequest"
       responses:
-        '200':
+        "200":
           description: Cart item updated successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Cart'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
+                $ref: "#/components/schemas/Cart"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
 
     delete:
       tags:
@@ -1360,12 +1439,12 @@ paths:
             format: int64
           description: Cart item ID
       responses:
-        '204':
+        "204":
           description: Item removed from cart successfully
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
 
   /cart/clear:
     delete:
@@ -1377,13 +1456,13 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '204':
+        "204":
           description: Cart cleared successfully
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
   # Like Products - Client
-  /products/{productId}/like:
+  /products/{productId}/likes:
     post:
       tags:
         - Products
@@ -1401,18 +1480,18 @@ paths:
             format: int64
           description: Product ID
       responses:
-        '201':
+        "201":
           description: Product liked successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
-        '409':
-          $ref: '#/components/responses/ConflictError'
+                $ref: "#/components/schemas/SuccessResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "409":
+          $ref: "#/components/responses/ConflictError"
 
     delete:
       tags:
@@ -1431,12 +1510,12 @@ paths:
             format: int64
           description: Product ID
       responses:
-        '204':
+        "204":
           description: Product unliked successfully
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
 
   /products/liked:
     get:
@@ -1462,14 +1541,14 @@ paths:
             minimum: 1
             maximum: 100
       responses:
-        '200':
+        "200":
           description: Liked products retrieved successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedProducts'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+                $ref: "#/components/schemas/PaginatedProducts"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
   # Orders Endpoints - Client
   /orders:
@@ -1486,18 +1565,18 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateOrderRequest'
+              $ref: "#/components/schemas/CreateOrderRequest"
       responses:
-        '201':
+        "201":
           description: Order created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+                $ref: "#/components/schemas/Order"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
     get:
       tags:
@@ -1528,14 +1607,14 @@ paths:
             enum: [PENDING, PAID, CANCELLED, SHIPPED, DELIVERED]
           description: Filter by order status
       responses:
-        '200':
+        "200":
           description: Orders retrieved successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedOrders'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+                $ref: "#/components/schemas/PaginatedOrders"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
   /orders/{orderId}:
     get:
@@ -1555,18 +1634,18 @@ paths:
             format: int64
           description: Order ID
       responses:
-        '200':
+        "200":
           description: Order details retrieved successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
+                $ref: "#/components/schemas/Order"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
 
     patch:
       tags:
@@ -1585,18 +1664,18 @@ paths:
             format: int64
           description: Order ID
       responses:
-        '200':
+        "200":
           description: Order cancelled successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
+                $ref: "#/components/schemas/Order"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
 
   # Payments Endpoints - Stripe Integration
   /payments:
@@ -1613,20 +1692,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreatePaymentRequest'
+              $ref: "#/components/schemas/CreatePaymentRequest"
       responses:
-        '201':
+        "201":
           description: Payment intent created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaymentResponse'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
+                $ref: "#/components/schemas/PaymentResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
 
   /payments/{paymentId}:
     get:
@@ -1646,18 +1725,18 @@ paths:
             format: int64
           description: Payment ID
       responses:
-        '200':
+        "200":
           description: Payment details retrieved successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Payment'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          $ref: '#/components/responses/ForbiddenError'
-        '404':
-          $ref: '#/components/responses/NotFoundError'
+                $ref: "#/components/schemas/Payment"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
 
   # Stripe Webhooks - Stateless Event Processing
   /webhooks/stripe:
@@ -1667,13 +1746,13 @@ paths:
       summary: Handle Stripe webhook events
       description: |
         Webhook endpoint for Stripe to send payment events. This is called directly by Stripe's servers.
-        
+
         Supported events:
         - payment_intent.succeeded
         - payment_intent.payment_failed
         - payment_intent.canceled
         - charge.refunded
-        
+
         The endpoint is stateless and idempotent - duplicate webhooks with the same event_id will not cause duplicate processing.
       operationId: handleStripeWebhook
       requestBody:
@@ -1681,20 +1760,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/StripeWebhookRequest'
+              $ref: "#/components/schemas/StripeWebhookRequest"
       responses:
-        '200':
+        "200":
           description: Webhook received and queued for processing
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
-        '400':
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
           description: Invalid webhook signature or format
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
 security:
   - bearerAuth: []
