@@ -1,4 +1,3 @@
-scalar Upload
 extend type Mutation {
   createProduct(input: CreateProductInput!): Product!
   updateProduct(id: ID!, input: UpdateProductInput!): Product!
@@ -16,9 +15,6 @@ extend type Mutation {
   createCategory(input: CreateCategoryInput!): Category!
   updateCategory(id: ID!, input: UpdateCategoryInput!): Category!
 }
-# ===========================================================
-# 💫 Mutations Inputs (This emoji was put in by an IA or no?)
-# ===========================================================
 
 input CreateProductInput {
   name: String!
@@ -26,11 +22,11 @@ input CreateProductInput {
   price: Float!
   categoryId: ID!
   stock: Int!
+  # TODO: Support multiple images upload
   images: [Upload!]
 }
 
 input UpdateProductInput {
-  id: ID!
   name: String
   description: String
   price: Float

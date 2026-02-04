@@ -1,46 +1,51 @@
-
 extend type Query {
-    myCart: Cart!
+  myCart: Cart
 
-    order(id: ID!): Order!
-    myOrders: [Order!]!
-    orderPayments(orderId: ID!): [Payment!]!
+  order(id: ID!): Order!
+  myOrders: [Order!]!
+  orderPayments(orderId: ID!): [Payment!]!
 
-    payment(id: ID!): Payment!
-    myPayments: [Payment!]!
+  payment(id: ID!): Payment!
+  myPayments: [Payment!]!
 
-    # Manager Endpoints
-    allOrders(filter: OrderFilterInput, pagination: PaginationInput):OrderConnection!
-    allPayments(filter: PaymentsFilterInput, pagination: PaginationInput): PaymentsConnection!
+  # Manager Endpoints
+  allOrders(
+    filter: OrderFilterInput
+    pagination: PaginationInput
+  ): OrdersConnection!
+  allPayments(
+    filter: PaymentsFilterInput
+    pagination: PaginationInput
+  ): PaymentsConnection!
 }
 
 input OrderFilterInput {
-    userId: ID
-    status: OrderStatus
-    from: DateTime
-    before: DateTime
+  userId: ID
+  status: OrderStatus
+  from: DateTime
+  before: DateTime
 }
 type OrderEdge {
-    node: Order!
-    cursor: String!
+  node: Order!
+  cursor: String!
 }
-type OrderConnection {
-    edges: [OrderEdge!]!
-    pageInfo: PageInfo!
+type OrdersConnection {
+  edges: [OrderEdge!]!
+  pageInfo: PageInfo!
 }
 
 input PaymentsFilterInput {
-    orderId: ID
-    userId: ID
-    status: PaymentStatus
-    from: DateTime
-    before: DateTime
+  orderId: ID
+  userId: ID
+  status: PaymentStatus
+  from: DateTime
+  before: DateTime
 }
 type PaymentsEdge {
-    node: Payment!
-    cursor: String!
+  node: Payment!
+  cursor: String!
 }
 type PaymentsConnection {
-    edges: [PaymentsEdge!]!
-    pageInfo: PageInfo!
+  edges: [PaymentsEdge!]!
+  pageInfo: PageInfo!
 }

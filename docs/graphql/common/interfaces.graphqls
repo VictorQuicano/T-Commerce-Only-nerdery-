@@ -1,5 +1,5 @@
 interface Node {
-    id: ID!
-    createdAt: DateTime
-    updatedAt: DateTime
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }

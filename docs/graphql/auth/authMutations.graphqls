@@ -1,42 +1,41 @@
 extend type Mutation {
-    signUp(input: SignUpInput!): AuthPayload!
-    login(input: LoginInput!): AuthPayload!
-    forgotPassword(email: String!): ForgotPasswordPayload!
-    resetPassword(input: ResetPasswordInput!): ResetPasswordPayload!
+  signUp(input: SignUpInput!): AuthPayload!
+  login(input: LoginInput!): AuthPayload!
+  forgotPassword(email: String!): ForgotPasswordPayload!
+  resetPassword(input: ResetPasswordInput!): ResetPasswordPayload!
 }
 
 type AuthPayload {
-    user: User!
-    access_token: String!
-    refresh_token: String!
+  user: User!
+  accessToken: String!
+  refreshToken: String!
 }
 
-
 type ForgotPasswordPayload {
-    success: Boolean!
-    message: String!
+  success: Boolean!
+  message: String!
 }
 
 type ResetPasswordPayload {
-    success: Boolean!
+  success: Boolean!
 }
 
 input SignUpInput {
-    email: String!
-    password: String!
-    passwordConfirmation: String!
-    firstName: String!
-    middleName: String
-    lastName: String!
+  email: String!
+  password: String!
+  passwordConfirmation: String!
+  firstName: String!
+  middleName: String
+  lastName: String!
 }
 
 input LoginInput {
-    email: String!
-    password: String!
+  email: String!
+  password: String!
 }
 
 input ResetPasswordInput {
-    token: String!
-    newPassword: String!
-    newPasswordConfirmation: String!
+  token: String!
+  newPassword: String!
+  newPasswordConfirmation: String!
 }

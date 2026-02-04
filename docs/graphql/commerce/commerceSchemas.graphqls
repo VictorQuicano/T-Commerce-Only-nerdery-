@@ -1,5 +1,3 @@
-
-
 type Category implements Node {
   id: ID!
   name: String
@@ -38,8 +36,7 @@ type Product implements Node {
   images: [ProductImage!]!
   stockLevel: StockLevel!
   isLiked: Boolean!
-  deletedAt: String!
+  deletedAt: DateTime!
   createdAt: DateTime!
   updatedAt: DateTime!
 }
-

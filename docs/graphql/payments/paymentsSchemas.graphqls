@@ -1,76 +1,75 @@
-scalar JSON
-
-type Cart {
-    id: ID!
-    user: User!
-    items: [CartItem!]!
-    totalItems: Int!
-    subtotal: Float!
-    createdAt: DateTime!
-    updatedAt: DateTime!
+type Cart implements Node {
+  id: ID!
+  user: User!
+  userId: ID!
+  items: [CartItem!]!
+  totalItems: Int!
+  subtotal: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
-type CartItem {
-    id: ID!
-    cartId: ID!
-    product: Product!
-    quantity: Int!
-    totalPrice: Float!
-    createdAt: DateTime!
-    updatedAt: DateTime!
+type CartItem implements Node {
+  id: ID!
+  cartId: ID!
+  product: Product!
+  quantity: Int!
+  totalPrice: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
-type Order {
-    id: ID!
-    user: User!
-    status: OrderStatus!
-    totalAmount: Float!
-    items: [OrderItem!]!
-    payments: [Payment!]!
-    createdAt: DateTime!
-    updatedAt: DateTime!
+type Order implements Node {
+  id: ID!
+  user: User!
+  status: OrderStatus!
+  totalAmount: Float!
+  items: [OrderItem!]!
+  payments: [Payment!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
-type OrderItem {
-    id: ID!
-    order: Order!
-    product: Product
-    productName: String!
-    productDescription: String
-    productPrice: Float!
-    productCategoryId: ID
-    quantity: Int!
-    total: Float!
-    createdAt: DateTime!
-    updatedAt: DateTime!
+type OrderItem implements Node {
+  id: ID!
+  order: Order!
+  product: Product
+  productName: String!
+  productDescription: String
+  productPrice: Float!
+  productCategoryId: ID
+  quantity: Int!
+  total: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
-type Payment {
-    id: ID!
-    order: Order!
-    amount: Float!
-    status: PaymentStatus!
-    description: String
-    paidAt: DateTime
-    paymentIntents: [PaymentIntent!]!
-    createdAt: DateTime!
-    updatedAt: DateTime!
+type Payment implements Node {
+  id: ID!
+  order: Order!
+  amount: Float!
+  status: PaymentStatus!
+  description: String
+  paidAt: DateTime
+  paymentIntents: [PaymentIntent!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
-type PaymentIntent {
-    id: ID!
-    payment: Payment!
-    stripePaymentIntentId: String!
-    status: PaymentIntentStatus!
+type PaymentIntent implements Node {
+  id: ID!
+  payment: Payment!
+  stripePaymentIntentId: String!
+  status: PaymentIntentStatus!
 }
-type StripeWebhook {
-    id: ID!
-    eventId: String!
-    eventType: String!
-    paymentIntentId: String
-    payload: JSON!
-    processed: Boolean!
-    receivedAt: DateTime!
-    processedAt: DateTime
-    createdAt: DateTime!
+type StripeWebhook implements Node {
+  id: ID!
+  eventId: String!
+  eventType: String!
+  paymentIntentId: String
+  payload: JSON!
+  processed: Boolean!
+  receivedAt: DateTime!
+  processedAt: DateTime
+  createdAt: DateTime!
 }

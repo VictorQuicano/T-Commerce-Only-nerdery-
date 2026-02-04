@@ -10,8 +10,6 @@ extend type Mutation {
   createPaymentIntent(orderId: ID!): StripeClientSecret!
   confirmPayment(input: ProcessPaymentInput!): Payment!
   retryPayment(paymentId: ID!): Payment!
-
-  handleStripeWebhook(signature: String!, payload: String!): Boolean!
 }
 
 input CartItemInput {

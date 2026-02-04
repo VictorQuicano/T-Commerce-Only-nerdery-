@@ -1,28 +1,28 @@
 extend type Query {
-    product(id: ID!): Product
-    categories: [Category!]!
-    category(id: ID!): Category
-    products(
-        filter: ProductFilterInput,
-        pagination: PaginationInput
-    ): ProductsConnection!
-    # Auth Queries
-    likedProducts: [Product!]!
+  product(id: ID!): Product
+  categories: [Category!]!
+  category(id: ID!): Category
+  products(
+    filter: ProductFilterInput
+    pagination: PaginationInput
+  ): ProductsConnection!
+  # Auth Queries
+  likedProducts: [Product!]!
 }
 
 input ProductFilterInput {
-    name: String
-    available: Boolean
-    categories: [String!]
-    liked: Boolean
-    priceGreaterThan: Float
-    priceLowestThan: Float
+  name: String
+  available: Boolean
+  categories: [String!]
+  liked: Boolean
+  priceGreaterThan: Float
+  priceLowestThan: Float
 }
 type ProductsEdge {
-    node: Product!
-    cursor: String!
+  node: Product!
+  cursor: String!
 }
-type ProductsConnection{
-    edges: [ProductsEdge]!
-    pageInfo: PageInfo!
+type ProductsConnection {
+  edges: [ProductsEdge]!
+  pageInfo: PageInfo!
 }
