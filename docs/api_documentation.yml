@@ -6,10 +6,14 @@ info:
   description: E-commerce platform API with authentication, product management, and Stripe payment integration
 
 tags:
+  - name: Common
+    description: General endpoints
   - name: Authentication
     description: User authentication endpoints
   - name: Profile
     description: User profile
+  - name: Profile Addresses
+    description: User Addresses
   - name: Products
     description: Product management and retrieval
   - name: Cart
@@ -18,8 +22,12 @@ tags:
     description: Order management
   - name: Payments
     description: Payment processing with Stripe
-  - name: Manager
-    description: Manager-specific operations
+  - name: Manager (Products & Categories)
+    description: Create Update Products
+  - name: Manager (Orders)
+    description: List, Update Orders
+  - name: Manager (Clients)
+    description: List, Update Clients
 
 components:
   securitySchemes:
@@ -75,6 +83,7 @@ components:
           format: email
         password:
           type: string
+          minLength: 8
 
     ForgotPasswordRequest:
       type: object
@@ -96,6 +105,8 @@ components:
         password:
           type: string
           minLength: 8
+          pattern: '(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])'
+          description: Must contain uppercase, lowercase, number and special character
 
     AuthResponse:
       type: object
@@ -112,8 +123,8 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         first_name:
           type: string
         middle_name:
@@ -156,9 +167,9 @@ components:
         email:
           type: string
           format: email
-        roleId:
-          type: integer
-          format: int64
+        roleid:
+          type: string
+          format: uuid
     DeleteAccountRequest:
       type: object
       required:
@@ -184,15 +195,21 @@ components:
         new_password:
           type: string
           format: password
+          minLength: 8
+          pattern: '(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])'
+          description: Must contain uppercase, lowercase, number and special character
         new_password_confirmation:
           type: string
           format: password
+          minLength: 8
+          pattern: '(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])'
+          description: Must contain uppercase, lowercase, number and special character
     Role:
       type: object
       properties:
         id:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         name:
           type: string
     PaginatedClients:
@@ -216,13 +233,431 @@ components:
             total_pages:
               type: integer
 
+    # Location Schemas
+    Country:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        phone_code:
+          type: string
+
+    Department:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+
+    Province:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+    District:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+    # Address Schemas
+    Address:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        district:
+          $ref: "#/components/schemas/District"
+        department:
+          $ref: "#/components/schemas/Department"
+        province:
+          $ref: "#/components/schemas/Province"
+        country:
+          $ref: "#/components/schemas/Country"
+        address:
+          type: string
+        reference:
+          type: string
+          nullable: true
+        zip_code:
+          type: string
+          maxLength: 10
+        phone:
+          type: string
+          maxLength: 20
+        is_default:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CreateAddressRequest:
+      type: object
+      required:
+        - district_id
+        - address
+        - phone
+      properties:
+        district_id:
+          type: string
+          format: uuid
+        address:
+          type: string
+          minLength: 1
+          maxLength: 255
+        reference:
+          type: string
+          nullable: true
+          maxLength: 500
+        zip_code:
+          type: string
+          maxLength: 10
+        phone:
+          type: string
+          maxLength: 20
+        is_default:
+          type: boolean
+          default: false
+
+    UpdateAddressRequest:
+      type: object
+      properties:
+        district_id:
+          type: string
+          format: uuid
+        address:
+          type: string
+          minLength: 1
+          maxLength: 255
+        reference:
+          type: string
+          nullable: true
+          maxLength: 500
+        zip_code:
+          type: string
+          maxLength: 10
+        phone:
+          type: string
+          maxLength: 20
+        is_default:
+          type: boolean
+
+    PaginatedAddresses:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Address"
+        pagination:
+          type: object
+          properties:
+            page:
+              type: integer
+              minimum: 1
+            per_page:
+              type: integer
+              minimum: 1
+            total:
+              type: integer
+            total_pages:
+              type: integer
+    # Warehouse
+    Warehouse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        address:
+          $ref: "#/components/schemas/Address"
+        admin_id:
+          type: string
+          format: uuid
+        admin:
+          $ref: "#/components/schemas/User"
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CreateWarehouseRequest:
+      type: object
+      required:
+        - district_id
+        - admin_id
+        - address
+        - phone
+      properties:
+        district_id:
+          type: string
+          format: uuid
+        address:
+          type: string
+          minLength: 1
+          maxLength: 255
+        reference:
+          type: string
+          nullable: true
+          maxLength: 500
+        zip_code:
+          type: string
+          maxLength: 10
+        phone:
+          type: string
+          maxLength: 20
+        admin_id:
+          type: string
+          format: uuid
+
+    UpdateWarehouseRequest:
+      type: object
+      properties:
+        district_id:
+          type: string
+          format: uuid
+        address:
+          type: string
+          minLength: 1
+          maxLength: 255
+        reference:
+          type: string
+          nullable: true
+          maxLength: 500
+        zip_code:
+          type: string
+          maxLength: 10
+        phone:
+          type: string
+          maxLength: 20
+        admin_id:
+          type: string
+          format: uuid
+
+    PaginatedWarehouses:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Warehouse"
+        pagination:
+          type: object
+          properties:
+            page:
+              type: integer
+              minimum: 1
+            per_page:
+              type: integer
+              minimum: 1
+            total:
+              type: integer
+            total_pages:
+              type: integer
+
+    # Stock
+    StockLevel:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        product:
+          $ref: "#/components/schemas/Product"
+        quantity:
+          type: integer
+          minimum: 0
+        warehouse:
+          $ref: "#/components/schemas/Warehouse"
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    UpdateStockRequest:
+      type: object
+      required:
+        - quantity
+      properties:
+        quantity:
+          type: integer
+          minimum: 0
+    # Discounts
+    DiscountType:
+      type: string
+      enum: [PERCENTAGE, FIXED]
+
+    DiscountRelation:
+      type: string
+      enum: [PRODUCT, CATEGORY]
+
+    Discount:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        type:
+          $ref: "#/components/schemas/DiscountType"
+        value:
+          type: number
+          format: double
+          minimum: 0
+        start_date:
+          type: string
+          format: date-time
+        end_date:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        deleted_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    CreateDiscountRequest:
+      type: object
+      required:
+        - name
+        - type
+        - value
+        - start_date
+        - end_date
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        type:
+          $ref: "#/components/schemas/DiscountType"
+        value:
+          type: number
+          format: double
+          minimum: 0
+        start_date:
+          type: string
+          format: date-time
+        end_date:
+          type: string
+          format: date-time
+
+    UpdateDiscountRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        type:
+          $ref: "#/components/schemas/DiscountType"
+        value:
+          type: number
+          format: double
+          minimum: 0
+        start_date:
+          type: string
+          format: date-time
+        end_date:
+          type: string
+          format: date-time
+
+    DiscountItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        discount:
+          $ref: "#/components/schemas/Discount"
+        relation_type:
+          $ref: "#/components/schemas/DiscountRelation"
+        item_id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    AssignDiscountRequest:
+      type: object
+      required:
+        - item_id
+        - relation_type
+      properties:
+        item_id:
+          type: string
+          format: uuid
+        relation_type:
+          $ref: "#/components/schemas/DiscountRelation"
+
+    PaginatedDiscounts:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Discount"
+        pagination:
+          type: object
+          properties:
+            page:
+              type: integer
+              minimum: 1
+            per_page:
+              type: integer
+              minimum: 1
+            total:
+              type: integer
+            total_pages:
+              type: integer
+
     # Product Schemas
+    ProductStatus:
+      type: string
+      enum: [AVAILABLE, DELETED, WITHOUT_STOCK]
+
+    ProductDiscount:
+      type: object
+      properties:
+        discount:
+          $ref: "#/components/schemas/Discount"
+        relation_type:
+          $ref: "#/components/schemas/DiscountRelation"
+
     Product:
       type: object
       properties:
         id:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         name:
           type: string
         description:
@@ -234,12 +669,18 @@ components:
           minimum: 0
         available:
           type: boolean
+        status:
+          $ref: "#/components/schemas/ProductStatus"
         category:
           $ref: "#/components/schemas/Category"
         images:
           type: array
           items:
             $ref: "#/components/schemas/ProductImage"
+        discounts:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductDiscount"
         liked_by_user:
           type: boolean
           description: Only present for authenticated requests
@@ -269,8 +710,8 @@ components:
           format: double
           minimum: 0
         category_id:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         images:
           type: array
           minItems: 1
@@ -295,8 +736,8 @@ components:
           format: double
           minimum: 0
         category_id:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         available:
           type: boolean
 
@@ -313,8 +754,8 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         name:
           type: string
 
@@ -350,8 +791,8 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         product:
           $ref: "#/components/schemas/Product"
         quantity:
@@ -365,8 +806,8 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         items:
           type: array
           items:
@@ -385,8 +826,8 @@ components:
         - quantity
       properties:
         product_id:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         quantity:
           type: integer
           minimum: 1
@@ -405,10 +846,19 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          format: int64
-        product:
-          $ref: "#/components/schemas/Product"
+          type: string
+          format: uuid
+        product_uuid:
+          type: string
+          format: uuid
+        product_name:
+          type: string
+        unit_price:
+          type: number
+          format: double
+        discount:
+          type: number
+          format: double
         quantity:
           type: integer
         price:
@@ -422,13 +872,12 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         user:
           $ref: "#/components/schemas/User"
         status:
-          type: string
-          enum: [PENDING, PAID, CANCELLED, SHIPPED, DELIVERED]
+          $ref: "#/components/schemas/OrderStatus"
         items:
           type: array
           items:
@@ -487,11 +936,11 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         order_id:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         amount:
           type: number
           format: double
@@ -516,8 +965,8 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         stripe_payment_intent_id:
           type: string
         status:
@@ -538,8 +987,8 @@ components:
         - order_id
       properties:
         order_id:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
 
     PaymentResponse:
       type: object
@@ -560,6 +1009,202 @@ components:
         data:
           type: object
 
+    # HISTORIALS
+    OrderStatus:
+      type: string
+      enum: [PENDING, PAID, CANCELLED, SHIPPED, DELIVERED]
+
+    OrderStatusHistory:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        order_id:
+          type: string
+          format: uuid
+          nullable: true
+        from_status:
+          $ref: "#/components/schemas/OrderStatus"
+          nullable: true
+        to_status:
+          $ref: "#/components/schemas/OrderStatus"
+        changed_by:
+          $ref: "#/components/schemas/User"
+        reason:
+          type: string
+          nullable: true
+          maxLength: 255
+        changed_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+
+    PaginatedOrderStatusHistory:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderStatusHistory"
+        pagination:
+          type: object
+          properties:
+            page:
+              type: integer
+              minimum: 1
+            per_page:
+              type: integer
+              minimum: 1
+            total:
+              type: integer
+            total_pages:
+              type: integer
+
+    PaymentStatus:
+      type: string
+      enum: [PENDING, PROCESSING, PAID, FAILED, CANCELLED, REFUNDED]
+
+    PaymentStatusHistory:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        payment_id:
+          type: string
+          format: uuid
+        from_status:
+          $ref: "#/components/schemas/PaymentStatus"
+          nullable: true
+        to_status:
+          $ref: "#/components/schemas/PaymentStatus"
+        reason:
+          type: string
+          nullable: true
+          maxLength: 255
+        changed_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+
+    PaginatedPaymentStatusHistory:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/PaymentStatusHistory"
+        pagination:
+          type: object
+          properties:
+            page:
+              type: integer
+              minimum: 1
+            per_page:
+              type: integer
+              minimum: 1
+            total:
+              type: integer
+            total_pages:
+              type: integer
+
+    PaymentIntentStatus:
+      type: string
+      enum:
+        [
+          REQUIRES_PAYMENT_METHOD,
+          REQUIRES_CONFIRMATION,
+          REQUIRES_ACTION,
+          PROCESSING,
+          SUCCESS,
+          CANCELED,
+        ]
+
+    PaymentIntentStatusHistory:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        payment_intent_id:
+          type: string
+          format: uuid
+        from_status:
+          $ref: "#/components/schemas/PaymentIntentStatus"
+          nullable: true
+        to_status:
+          $ref: "#/components/schemas/PaymentIntentStatus"
+        reason:
+          type: string
+          nullable: true
+          maxLength: 255
+        changed_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+
+    PaginatedPaymentIntentStatusHistory:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/PaymentIntentStatusHistory"
+        pagination:
+          type: object
+          properties:
+            page:
+              type: integer
+              minimum: 1
+            per_page:
+              type: integer
+              minimum: 1
+            total:
+              type: integer
+            total_pages:
+              type: integer
+    # Payments with details
+    PaymentIntentWithHistory:
+      allOf:
+        - $ref: "#/components/schemas/PaymentIntent"
+        - type: object
+          properties:
+            status_history:
+              type: array
+              items:
+                $ref: "#/components/schemas/PaymentIntentStatusHistory"
+
+    PaymentWithDetails:
+      allOf:
+        - $ref: "#/components/schemas/Payment"
+        - type: object
+          properties:
+            status_history:
+              type: array
+              items:
+                $ref: "#/components/schemas/PaymentStatusHistory"
+            payment_intent_with_history:
+              $ref: "#/components/schemas/PaymentIntentWithHistory"
+              nullable: true
+
+    # Orders with historial
+    OrderWithHistory:
+      allOf:
+        - $ref: "#/components/schemas/Order"
+        - type: object
+          properties:
+            status_history:
+              type: array
+              items:
+                $ref: "#/components/schemas/OrderStatusHistory"
+
     # Error Response
     ErrorResponse:
       type: object
@@ -574,6 +1219,66 @@ components:
             details:
               type: object
               nullable: true
+
+    ProblemDetails:
+      type: object
+      required:
+        - type
+        - title
+        - status
+      properties:
+        type:
+          type: string
+          format: uri
+          description: >
+            A URI reference that identifies the problem type.
+            It should be stable and resolvable to human-readable documentation.
+          example: https://example.com/problems/invalid-parameter
+
+        title:
+          type: string
+          description: A short, human-readable summary of the problem type
+          example: Invalid parameter
+
+        status:
+          type: integer
+          format: int32
+          description: The HTTP status code generated by the server
+          example: 400
+
+        detail:
+          type: string
+          description: A human-readable explanation specific to this occurrence
+          example: The 'age' parameter must be a positive integer.
+
+        instance:
+          type: string
+          format: uri
+          description: A URI reference that identifies the specific occurrence
+          example: /users/123
+
+    ValidationProblemDetails:
+      allOf:
+        - $ref: "#/components/schemas/ProblemDetails"
+        - type: object
+          properties:
+            invalidParams:
+              type: array
+              description: List of invalid request parameters
+              items:
+                type: object
+                required:
+                  - name
+                  - reason
+                properties:
+                  name:
+                    type: string
+                    description: Name of the invalid parameter
+                    example: age
+                  reason:
+                    type: string
+                    description: Reason why the parameter is invalid
+                    example: Must be a positive integer
 
     SuccessResponse:
       type: object
@@ -617,9 +1322,200 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ErrorResponse"
+            $ref: "#/components/schemas/ValidationProblemDetails"
 
 paths:
+  /locations/countries:
+    get:
+      summary: Get all countries
+      description: Retrieve all countries with their details
+      operationId: getCountries
+      tags:
+        - Common
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        "200":
+          description: List of countries
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Country"
+                  pagination:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                      per_page:
+                        type: integer
+                      total:
+                        type: integer
+                      total_pages:
+                        type: integer
+
+  /locations/countries/{countryId}/departments:
+    get:
+      summary: Get departments by country
+      description: Retrieve all departments for a specific country
+      operationId: getDepartments
+      tags:
+        - Common
+      parameters:
+        - name: countryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        "200":
+          description: List of departments
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Department"
+                  pagination:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                      per_page:
+                        type: integer
+                      total:
+                        type: integer
+                      total_pages:
+                        type: integer
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+
+  /locations/departments/{departmentId}/provinces:
+    get:
+      summary: Get provinces by department
+      description: Retrieve all provinces for a specific department
+      operationId: getProvinces
+      tags:
+        - Common
+      parameters:
+        - name: departmentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        "200":
+          description: List of provinces
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Province"
+                  pagination:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                      per_page:
+                        type: integer
+                      total:
+                        type: integer
+                      total_pages:
+                        type: integer
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+
+  /locations/provinces/{provinceId}/districts:
+    get:
+      summary: Get districts by province
+      description: Retrieve all districts for a specific province
+      operationId: getDistricts
+      tags:
+        - Common
+      parameters:
+        - name: provinceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        "200":
+          description: List of districts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/District"
+                  pagination:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                      per_page:
+                        type: integer
+                      total:
+                        type: integer
+                      total_pages:
+                        type: integer
+        "404":
+          $ref: "#/components/responses/NotFoundError"
   # Authentication Endpoints
   /users:
     post:
@@ -852,14 +1748,6 @@ paths:
       responses:
         "204":
           description: Account deleted successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Account deleted successfully"
         "400":
           $ref: "#/components/responses/ValidationError"
         "401":
@@ -894,6 +1782,122 @@ paths:
           $ref: "#/components/responses/ValidationError"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
+
+  # User Adresses management
+  /me/addresses:
+    get:
+      summary: Get current user addresses
+      description: Retrieve all addresses for the authenticated user
+      operationId: getUserAddresses
+      tags:
+        - Profile Addresses
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: List of user addresses
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedAddresses"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+    post:
+      summary: Create a new address
+      description: Add a new address to the authenticated user's profile
+      operationId: createAddress
+      tags:
+        - Profile Addresses
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAddressRequest"
+      responses:
+        "201":
+          description: Address created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Address"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /me/addresses/{addressId}:
+    patch:
+      summary: Update an address
+      description: Update an existing address
+      operationId: updateAddress
+      tags:
+        - Profile Addresses
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: addressId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAddressRequest"
+      responses:
+        "200":
+          description: Address updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Address"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+
+    delete:
+      summary: Delete an address
+      description: Delete an existing address
+      operationId: deleteAddress
+      tags:
+        - Profile Addresses
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: addressId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Address deleted successfully
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
 
   # Products Endpoints
   /categories:
@@ -952,8 +1956,8 @@ paths:
         - name: category_id
           in: query
           schema:
-            type: integer
-            format: int64
+            type: string
+            format: uuid
           description: Category ID to filter by
         - name: name
           in: query
@@ -994,8 +1998,8 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
-            format: int64
+            type: string
+            format: uuid
           description: Product ID
       responses:
         "200":
@@ -1011,7 +2015,7 @@ paths:
   /manager/categories:
     post:
       tags:
-        - Manager
+        - Manager (Products & Categories)
       summary: Create categories
       description: Create a category. Manager role required.
       security:
@@ -1025,11 +2029,11 @@ paths:
               $ref: "#/components/schemas/CategoryCreateRequest"
       responses:
         "201":
-          description: Product created successfully
+          description: Category created successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Product"
+                $ref: "#/components/schemas/Category"
         "400":
           $ref: "#/components/responses/ValidationError"
         "401":
@@ -1039,7 +2043,7 @@ paths:
   /manager/products:
     post:
       tags:
-        - Manager
+        - Manager (Products & Categories)
       summary: Create a new product
       description: Create a new product. Manager role required.
       operationId: createProduct
@@ -1068,7 +2072,7 @@ paths:
   /manager/products/{productId}:
     patch:
       tags:
-        - Manager
+        - Manager (Products & Categories)
       summary: Update product
       description: Update an existing product. Manager role required.
       operationId: updateProduct
@@ -1079,8 +2083,8 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
-            format: int64
+            type: string
+            format: uuid
           description: Product ID to update
       requestBody:
         required: true
@@ -1106,7 +2110,7 @@ paths:
 
     delete:
       tags:
-        - Manager
+        - Manager (Products & Categories)
       summary: Delete product
       description: Permanently delete a product. Manager role required.
       operationId: deleteProduct
@@ -1117,8 +2121,8 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
-            format: int64
+            type: string
+            format: uuid
           description: Product ID to delete
       responses:
         "204":
@@ -1133,7 +2137,7 @@ paths:
   /manager/products/{productId}/images:
     post:
       tags:
-        - Manager
+        - Manager (Products & Categories)
       summary: Upload product image
       description: Upload an image for a product. Multiple images can be uploaded with different order values. Manager role required.
       operationId: uploadProductImage
@@ -1144,8 +2148,8 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
-            format: int64
+            type: string
+            format: uuid
           description: Product ID
       requestBody:
         required: true
@@ -1184,7 +2188,7 @@ paths:
   /manager/products/{productId}/images/{imageId}:
     delete:
       tags:
-        - Manager
+        - Manager (Products & Categories)
       summary: Delete product image
       description: Delete a product image. Manager role required.
       operationId: deleteProductImage
@@ -1195,14 +2199,14 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
-            format: int64
+            type: string
+            format: uuid
         - name: imageId
           in: path
           required: true
           schema:
-            type: integer
-            format: int64
+            type: string
+            format: uuid
       responses:
         "204":
           description: Image deleted successfully
@@ -1216,7 +2220,7 @@ paths:
   /manager/orders:
     get:
       tags:
-        - Mananager (Orders)
+        - Manager (Orders)
       summary: View all client orders
       description: Retrieve all orders from all clients with pagination. Manager role required.
       operationId: getManagerOrders
@@ -1245,8 +2249,8 @@ paths:
         - name: user_id
           in: query
           schema:
-            type: integer
-            format: int64
+            type: string
+            format: uuid
           description: Filter by specific user
       responses:
         "200":
@@ -1259,11 +2263,53 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
         "403":
           $ref: "#/components/responses/ForbiddenError"
+  /manager/orders/{orderId}/status:
+    put:
+      tags:
+        - Manager (Orders)
+      summary: Update order status
+      description: Change the status of a specific order. Manager role required.
 
+      operationId: changeOrderStatus
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Order ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  $ref: "#/components/schemas/OrderStatus"
+              required:
+                - status
+
+      responses:
+        "200":
+          description: Order Status changed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
   /manager/clients:
     get:
       tags:
-        - Mananager (Clients)
+        - Manager (Clients)
       summary: View all clients
       description: Retrieve a paginated list of clients. Supports filtering by first name. Manager role required.
       operationId: managerGetClients
@@ -1304,7 +2350,7 @@ paths:
   /manager/clients/{clientId}:
     patch:
       tags:
-        - Mananager (Clients)
+        - Manager (Clients)
       summary: Update user profile
       description: Updates the profile information of an existing user. This operation requires manager privileges.
       operationId: updateUserProfile
@@ -1335,6 +2381,379 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
         "404":
           description: User not found
+  /warehouses:
+    get:
+      summary: Get all warehouses
+      description: Retrieve all warehouses with pagination
+      operationId: getWarehouses
+      tags:
+        - Warehouses
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: List of warehouses
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedWarehouses"
+
+  /manager/warehouses:
+    post:
+      summary: Create a new warehouse
+      description: Create a new warehouse (manager only)
+      operationId: createWarehouse
+      tags:
+        - Warehouses
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateWarehouseRequest"
+      responses:
+        "201":
+          description: Warehouse created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Warehouse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+
+  /manager/warehouses/{warehouseId}:
+    patch:
+      summary: Update a warehouse
+      description: Update warehouse details (manager only)
+      operationId: updateWarehouse
+      tags:
+        - Warehouses
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: warehouseId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateWarehouseRequest"
+      responses:
+        "200":
+          description: Warehouse updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Warehouse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+
+    delete:
+      summary: Delete a warehouse
+      description: Delete a warehouse (manager only)
+      operationId: deleteWarehouse
+      tags:
+        - Warehouses
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: warehouseId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Warehouse deleted successfully
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+
+  /manager/warehouses/{warehouseId}/stock/{productId}:
+    put:
+      summary: Update product stock in warehouse
+      description: Update the quantity of a product in a specific warehouse (admin only)
+      operationId: updateStock
+      tags:
+        - Stock
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: warehouseId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateStockRequest"
+      responses:
+        "200":
+          description: Stock updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StockLevel"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+
+  # Discount
+  /manager/discounts:
+    post:
+      summary: Create a new discount
+      description: Create a new discount (manager only)
+      operationId: createDiscount
+      tags:
+        - Discounts
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDiscountRequest"
+      responses:
+        "201":
+          description: Discount created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Discount"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+
+    get:
+      summary: Get all discounts
+      description: Retrieve all discounts with pagination (manager only)
+      operationId: getDiscounts
+      tags:
+        - Discounts
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: is_active
+          in: query
+          schema:
+            type: boolean
+        - name: type
+          in: query
+          schema:
+            $ref: "#/components/schemas/DiscountType"
+        - name: since
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date-time
+
+      responses:
+        "200":
+          description: List of discounts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedDiscounts"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+
+  /manager/discounts/{discountId}:
+    patch:
+      summary: Update a discount
+      description: Update discount details (manager only)
+      operationId: updateDiscount
+      tags:
+        - Discounts
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: discountId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateDiscountRequest"
+      responses:
+        "200":
+          description: Discount updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Discount"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+
+    delete:
+      summary: Delete a discount
+      description: Soft delete a discount (manager only)
+      operationId: deleteDiscount
+      tags:
+        - Discounts
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: discountId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Discount deleted successfully
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+
+  /manager/discounts/{discountId}/items:
+    post:
+      summary: Assign discount to product or category
+      description: Assign a discount to a product or category (manager only)
+      operationId: assignDiscountItem
+      tags:
+        - Discounts
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: discountId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssignDiscountRequest"
+      responses:
+        "201":
+          description: Discount assigned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscountItem"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+
+    delete:
+      summary: Remove discount from product or category
+      description: Remove a discount assignment (manager only)
+      operationId: removeDiscountItem
+      tags:
+        - Discounts
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: discountId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: item_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Discount removed successfully
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
 
   # Cart Endpoints - Client
   /cart:
@@ -1399,8 +2818,8 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
-            format: int64
+            type: string
+            format: uuid
           description: Cart item ID
       requestBody:
         required: true
@@ -1435,8 +2854,8 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
-            format: int64
+            type: string
+            format: uuid
           description: Cart item ID
       responses:
         "204":
@@ -1476,8 +2895,8 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
-            format: int64
+            type: string
+            format: uuid
           description: Product ID
       responses:
         "201":
@@ -1506,8 +2925,8 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
-            format: int64
+            type: string
+            format: uuid
           description: Product ID
       responses:
         "204":
@@ -1630,8 +3049,8 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
-            format: int64
+            type: string
+            format: uuid
           description: Order ID
       responses:
         "200":
@@ -1660,8 +3079,8 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
-            format: int64
+            type: string
+            format: uuid
           description: Order ID
       responses:
         "200":
@@ -1677,6 +3096,71 @@ paths:
         "404":
           $ref: "#/components/responses/NotFoundError"
 
+  /orders/{orderId}/history:
+    get:
+      summary: Get order status history
+      description: Retrieve the status change history for an order
+      operationId: getOrderHistory
+      tags:
+        - Orders
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: Order status history
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedOrderStatusHistory"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+
+  /orders/{orderId}/with-history:
+    get:
+      summary: Get order with complete history
+      description: Retrieve an order with all its status change history
+      operationId: getOrderWithHistory
+      tags:
+        - Orders
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Order with history
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderWithHistory"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
   # Payments Endpoints - Stripe Integration
   /payments:
     post:
@@ -1721,8 +3205,8 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
-            format: int64
+            type: string
+            format: uuid
           description: Payment ID
       responses:
         "200":
@@ -1745,16 +3229,29 @@ paths:
         - Payments
       summary: Handle Stripe webhook events
       description: |
-        Webhook endpoint for Stripe to send payment events. This is called directly by Stripe's servers.
+        Webhook endpoint for Stripe events.
+
+        Security requirements:
+        - Requests MUST include the `Stripe-Signature` header.
+        - The request body must be validated using the Stripe webhook signing secret.
+        - Requests with invalid or missing signatures are rejected with 400.
 
         Supported events:
         - payment_intent.succeeded
         - payment_intent.payment_failed
         - payment_intent.canceled
         - charge.refunded
-
-        The endpoint is stateless and idempotent - duplicate webhooks with the same event_id will not cause duplicate processing.
       operationId: handleStripeWebhook
+      parameters:
+        - in: header
+          name: Stripe-Signature
+          required: true
+          schema:
+            type: string
+          description: >
+            Stripe-generated signature used to verify the authenticity
+            of the webhook payload. Required for all webhook requests.
+
       requestBody:
         required: true
         content:
