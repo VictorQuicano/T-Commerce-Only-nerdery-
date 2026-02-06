@@ -22,10 +22,32 @@ type CartItem implements Node {
 type Order implements Node {
   id: ID!
   user: User!
+  userId: ID!
+  address: Address!
+  addressId: ID!
   status: OrderStatus!
   totalAmount: Float!
   items: [OrderItem!]!
+  record: [OrderStatusHistory!]!
   payments: [Payment!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type OrderStatusHistory implements Node {
+  id: ID!
+  order: Order!
+  orderId: ID!
+
+  fromStatus: OrderStatus!
+  toStatus: OrderStatus!
+
+  changedAt: DateTime!
+  changedBy: User!
+  changedById: ID!
+
+  reason: String
+
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -36,7 +58,8 @@ type OrderItem implements Node {
   product: Product
   productName: String!
   productDescription: String
-  productPrice: Float!
+  originalPrice: Float!
+  discountedPrice: Float!
   productCategoryId: ID
   quantity: Int!
   total: Float!
@@ -52,6 +75,23 @@ type Payment implements Node {
   description: String
   paidAt: DateTime
   paymentIntents: [PaymentIntent!]!
+  record: [PaymentStatusHistory!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type PaymentStatusHistory implements Node {
+  id: ID!
+  payment: Payment!
+  paymentId: ID!
+
+  fromStatus: PaymentStatus!
+  toStatus: PaymentStatus!
+
+  changedAt: DateTime!
+
+  reason: String
+
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -61,7 +101,27 @@ type PaymentIntent implements Node {
   payment: Payment!
   stripePaymentIntentId: String!
   status: PaymentIntentStatus!
+  record: [PaymentIntentStatusHistory!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
+
+type PaymentIntentStatusHistory implements Node {
+  id: ID!
+  paymentIntent: PaymentIntent!
+  paymentIntentId: ID!
+
+  fromStatus: PaymentIntentStatus!
+  toStatus: PaymentIntentStatus!
+
+  changedAt: DateTime!
+
+  reason: String
+
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
 type StripeWebhook implements Node {
   id: ID!
   eventId: String!

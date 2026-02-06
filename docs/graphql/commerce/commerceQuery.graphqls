@@ -8,6 +8,17 @@ extend type Query {
   ): ProductsConnection!
   # Auth Queries
   likedProducts: [Product!]!
+  # Warehouse Queries
+  warehouse(id: ID!): Warehouse
+  warehouseStockLevels(warehouseId: ID!): [StockLevel!]!
+  warehouses(
+    filter: WarehouseFilterInput
+    pagination: PaginationInput
+  ): WarehousesConnection!
+  discounts(
+    filter: DiscountFilterInput
+    pagination: PaginationInput
+  ): DiscountsConnection!
 }
 
 input ProductFilterInput {
@@ -24,5 +35,39 @@ type ProductsEdge {
 }
 type ProductsConnection {
   edges: [ProductsEdge]!
+  pageInfo: PageInfo!
+}
+
+input WarehouseFilterInput {
+  adminUserId: ID
+  districtId: ID
+  departmentId: ID
+  provinceId: ID
+  countryId: ID
+}
+
+type WarehousesEdge {
+  node: Warehouse!
+  cursor: String!
+}
+type WarehousesConnection {
+  edges: [WarehousesEdge]!
+  pageInfo: PageInfo!
+}
+
+input DiscountFilterInput {
+  productId: ID
+  categoryId: ID
+  active: Boolean
+  since: DateTime
+  until: DateTime
+}
+
+type DiscountsEdge {
+  node: Discount!
+  cursor: String!
+}
+type DiscountsConnection {
+  edges: [DiscountsEdge]!
   pageInfo: PageInfo!
 }

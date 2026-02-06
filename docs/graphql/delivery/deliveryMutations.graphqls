@@ -1,0 +1,23 @@
+extend type Mutation {
+  createAddress(input: CreateAddressInput!): Address!
+  updateAddress(id: ID!, input: UpdateAddressInput!): Address!
+  deleteAddress(id: ID!): Boolean!
+  setDefaultAddress(id: ID!): Boolean!
+}
+
+input CreateAddressInput {
+  address: String!
+  reference: String
+  districtId: ID!
+  zipCode: String!
+  phone: String!
+  isDefault: Boolean
+}
+input UpdateAddressInput {
+  address: String
+  reference: String
+  districtId: ID
+  zipCode: String
+  phone: String
+  isDefault: Boolean
+}

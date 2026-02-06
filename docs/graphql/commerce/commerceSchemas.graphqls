@@ -16,14 +16,32 @@ type ProductImage implements Node {
   updatedAt: DateTime!
 }
 
-type StockLevel implements Node {
+type Warehouse implements Node {
   id: ID!
-
-  productId: ID!
-  quantity: Int!
-
+  address: Address!
+  addressId: ID!
+  adminUserId: ID!
+  admin: User!
+  stockLevels: [StockLevel!]!
   createdAt: DateTime!
   updatedAt: DateTime!
+}
+
+type StockLevel implements Node {
+  id: ID!
+  product: Product!
+  productId: ID!
+  quantity: Int!
+  warehouse: Warehouse!
+  warehouseId: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+enum ProductStatus {
+  ACTIVE
+  INACTIVE
+  OUT_OF_STOCK
 }
 
 type Product implements Node {
@@ -33,10 +51,36 @@ type Product implements Node {
   price: Float!
   category: Category!
   categoryId: ID!
+  status: ProductStatus!
   images: [ProductImage!]!
-  stockLevel: StockLevel!
+  stockLevel: [StockLevel!]!
+
   isLiked: Boolean!
+  discounts: [Discount!]!
   deletedAt: DateTime!
   createdAt: DateTime!
   updatedAt: DateTime!
+}
+enum DiscountType {
+  PERCENTAGE
+  FIXED_AMOUNT
+}
+enum DiscountScope {
+  PRODUCT
+  CATEGORY
+}
+type Discount implements Node {
+  id: ID!
+
+  itemId: ID!
+  type: DiscountType!
+
+  scope: DiscountScope!
+  value: Float!
+  validFrom: DateTime!
+  validTo: DateTime!
+
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime!
 }

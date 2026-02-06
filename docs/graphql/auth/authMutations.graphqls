@@ -1,8 +1,12 @@
 extend type Mutation {
   signUp(input: SignUpInput!): AuthPayload!
   login(input: LoginInput!): AuthPayload!
+  logout: Boolean!
+
   forgotPassword(email: String!): ForgotPasswordPayload!
   resetPassword(input: ResetPasswordInput!): ResetPasswordPayload!
+
+  changePassword(input: ChangePasswordInput!): Boolean!
 }
 
 type AuthPayload {
@@ -36,6 +40,12 @@ input LoginInput {
 
 input ResetPasswordInput {
   token: String!
+  newPassword: String!
+  newPasswordConfirmation: String!
+}
+
+input ChangePasswordInput {
+  currentPassword: String!
   newPassword: String!
   newPasswordConfirmation: String!
 }

@@ -1,0 +1,6 @@
+extend type Query {
+  countries: [Country!]!
+  departments(countryId: ID!): [Department!]!
+  provinces(departmentId: ID!): [Province!]!
+  districts(provinceId: ID!): [District!]!
+}
