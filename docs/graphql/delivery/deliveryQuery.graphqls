@@ -1,0 +1,26 @@
+extend type Query {
+    myAddresses: [Address!]!
+    address(id: ID!): Address
+    myPrincipalAddress: Address
+    
+    addresses(): 
+}
+
+type AddressesEdge {
+    node: Address!
+    cursor: String!
+}
+type AddressesConnection {
+    edges: [AddressesEdge]!
+    pageInfo: PageInfo!
+}
+input AddressesFilterInput {
+    address: String
+    reference: String
+    districtId: ID
+    provinceId: ID
+    departmentId: ID
+    countryId: ID
+    zipCode: String
+    isDefault: Boolean
+}

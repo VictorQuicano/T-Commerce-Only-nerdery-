@@ -1,0 +1,98 @@
+extend type Mutation {
+  createProduct(input: CreateProductInput!): Product!
+  updateProduct(id: ID!, input: UpdateProductInput!): Product!
+  deleteProduct(id: ID!): Boolean!
+  updateStock(productId: ID!, warehouseId: ID!, stock: Int!): Product!
+  toggleProductLike(id: ID!): Product!
+
+  # Product Image mutations
+  uploadProductImage(productId: ID!, file: Upload!, order: Int): ProductImage!
+
+  deleteProductImage(id: ID!): Boolean!
+
+  # Category mutations (Manager only)
+  createCategory(input: CreateCategoryInput!): Category!
+  updateCategory(id: ID!, input: UpdateCategoryInput!): Category!
+
+  # Discount mutations (Manager only)
+  createDiscount(input: CreateDiscountInput!): Discount!
+  updateDiscount(id: ID!, input: UpdateDiscountInput!): Discount!
+  deleteDiscount(id: ID!): Boolean!
+
+  # Warehouse mutations (Manager only)
+  createWarehouse(input: CreateWarehouseInput!): Warehouse!
+  updateWarehouse(id: ID!, input: UpdateWarehouseInput!): Warehouse!
+  deleteWarehouse(id: ID!): Boolean!
+}
+
+input CreateProductInput {
+  name: String!
+  description: String
+  price: Float!
+  categoryId: ID!
+  stock: Int!
+  # TODO: Support multiple images upload
+  images: [Upload!]
+}
+
+input UpdateProductInput {
+  name: String
+  description: String
+  price: Float
+  categoryId: ID
+  stock: Int
+}
+
+input CreateCategoryInput {
+  name: String!
+}
+
+input UpdateCategoryInput {
+  id: ID!
+  name: String
+}
+
+input CreateDiscountInput {
+  itemId: ID!
+  type: DiscountItemType!
+
+  scope: DiscountScope!
+  value: Float!
+
+  validFrom: DateTime!
+  validTo: DateTime!
+}
+
+input UpdateDiscountInput {
+  itemId: ID!
+  type: DiscountItemType
+
+  scope: DiscountScope
+  value: Float
+
+  validFrom: DateTime
+  validTo: DateTime
+}
+
+input CreateWarehouseInput {
+  # Address Info
+  address: String!
+  reference: String
+  district: District!
+  districtId: ID!
+  zipCode: String!
+  phone: String!
+
+  adminUserId: ID!
+}
+
+input UpdateWarehouseInput {
+  # Address Info
+  address: String
+  reference: String
+  districtId: ID
+  zipCode: String
+  phone: String
+
+  adminUserId: ID
+}

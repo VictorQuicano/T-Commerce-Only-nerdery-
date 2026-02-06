@@ -1,0 +1,135 @@
+type Cart implements Node {
+  id: ID!
+  user: User!
+  userId: ID!
+  items: [CartItem!]!
+  totalItems: Int!
+  subtotal: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type CartItem implements Node {
+  id: ID!
+  cartId: ID!
+  product: Product!
+  quantity: Int!
+  totalPrice: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Order implements Node {
+  id: ID!
+  user: User!
+  userId: ID!
+  address: Address!
+  addressId: ID!
+  status: OrderStatus!
+  totalAmount: Float!
+  items: [OrderItem!]!
+  record: [OrderStatusHistory!]!
+  payments: [Payment!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type OrderStatusHistory implements Node {
+  id: ID!
+  order: Order!
+  orderId: ID!
+
+  fromStatus: OrderStatus!
+  toStatus: OrderStatus!
+
+  changedAt: DateTime!
+  changedBy: User!
+  changedById: ID!
+
+  reason: String
+
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type OrderItem implements Node {
+  id: ID!
+  order: Order!
+  product: Product
+  productName: String!
+  productDescription: String
+  originalPrice: Float!
+  discountedPrice: Float!
+  productCategoryId: ID
+  quantity: Int!
+  total: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Payment implements Node {
+  id: ID!
+  order: Order!
+  amount: Float!
+  status: PaymentStatus!
+  description: String
+  paidAt: DateTime
+  paymentIntents: [PaymentIntent!]!
+  record: [PaymentStatusHistory!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type PaymentStatusHistory implements Node {
+  id: ID!
+  payment: Payment!
+  paymentId: ID!
+
+  fromStatus: PaymentStatus!
+  toStatus: PaymentStatus!
+
+  changedAt: DateTime!
+
+  reason: String
+
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type PaymentIntent implements Node {
+  id: ID!
+  payment: Payment!
+  stripePaymentIntentId: String!
+  status: PaymentIntentStatus!
+  record: [PaymentIntentStatusHistory!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type PaymentIntentStatusHistory implements Node {
+  id: ID!
+  paymentIntent: PaymentIntent!
+  paymentIntentId: ID!
+
+  fromStatus: PaymentIntentStatus!
+  toStatus: PaymentIntentStatus!
+
+  changedAt: DateTime!
+
+  reason: String
+
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type StripeWebhook implements Node {
+  id: ID!
+  eventId: String!
+  eventType: String!
+  paymentIntentId: String
+  payload: JSON!
+  processed: Boolean!
+  receivedAt: DateTime!
+  processedAt: DateTime
+  createdAt: DateTime!
+}

@@ -1,0 +1,22 @@
+extend type Query {
+  me: User
+  userById(id: ID!): User
+  userByEmail(email: String!): User
+  users(filter: UserFilterInput, pagination: PaginationInput!): UsersConnection!
+}
+
+input UserFilterInput {
+  firstName: String
+  middleName: String
+  lastName: String
+  roleId: ID
+}
+
+type UsersEdge {
+  node: User!
+  cursor: String!
+}
+type UsersConnection {
+  edges: [UsersEdge!]!
+  pageInfo: PageInfo!
+}

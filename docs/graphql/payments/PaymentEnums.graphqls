@@ -1,0 +1,25 @@
+enum OrderStatus {
+    PENDING
+    PAID
+    CANCELLED
+    SHIPPED
+    DELIVERED
+}
+
+enum PaymentStatus {
+    PENDING
+    PROCESSING
+    PAID
+    FAILED
+    CANCELLED
+    REFUNDED
+}
+
+enum PaymentIntentStatus {
+    REQUIRES_PAYMENT_METHOD
+    REQUIRES_CONFIRMATION
+    REQUIRES_ACTION
+    PROCESSING
+    SUCCESS
+    CANCELED
+}

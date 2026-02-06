@@ -1,0 +1,38 @@
+type Country implements Node {
+  id: ID!
+  name: String!
+  phoneCode: String!
+}
+type Department implements Node {
+  id: ID!
+  name: String!
+  country: Country!
+  countryId: ID!
+}
+
+type Province implements Node {
+  id: ID!
+  name: String!
+  department: Department!
+  departmentId: ID!
+}
+
+type District implements Node {
+  id: ID!
+  name: String!
+  province: Province!
+  provinceId: ID!
+}
+
+type Address implements Node {
+  id: ID!
+  address: String!
+  reference: String
+  district: District!
+  districtId: ID!
+  zipCode: String!
+  phone: String!
+  isDefault: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}

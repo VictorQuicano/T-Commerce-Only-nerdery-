@@ -1,0 +1,33 @@
+extend type Mutation {
+  addToCart(input: CartItemInput!): Cart!
+  updateCartItem(id: ID!, quantity: Int!): Cart!
+  removeFromCart(id: ID!): Boolean!
+  clearCart: Boolean!
+
+  createOrder(input: CreateOrderInput!): Order!
+  cancelOrder(id: ID!): Order!
+
+  createPaymentIntent(orderId: ID!): StripeClientSecret!
+  confirmPayment(input: ProcessPaymentInput!): Payment!
+  retryPayment(paymentId: ID!): Payment!
+}
+
+input CartItemInput {
+  productId: ID!
+  quantity: Int!
+}
+
+input CreateOrderInput {
+  cartId: ID!
+  discountCode: String
+}
+
+input ProcessPaymentInput {
+  orderId: ID!
+  paymentMethodId: String!
+}
+
+type StripeClientSecret {
+  clientSecret: String!
+  paymentIntentId: String!
+}
