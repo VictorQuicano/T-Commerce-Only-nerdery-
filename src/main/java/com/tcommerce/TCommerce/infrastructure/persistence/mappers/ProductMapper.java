@@ -48,19 +48,7 @@ public class ProductMapper {
         );
 
         if (domain.getCategoryId() != null) {
-            // Used for reference only, repositories should handle full entity loading if needed.
-            // Using a partial entity for ID mapping.
-            // WARNING: This assumes that name is not needed for just setting the ID on persistence if using EntityManager.getReference
-            // However, creating a new Entity with just ID might fail validation if Name is nullable=false and we try to persist it as new.
-            // But here we are mapping Product, and we will set Category on Product.
-            // If JPA finds an entity with this ID, it manages the relationship.
             CategoryEntity category = new CategoryEntity(domain.getCategoryId(), "", null, null);
-            // We set name to "" to avoid null pointer if accessed, but validation might fail if we tried to save THIS category.
-            // Ideally we fetch the category reference.
-            // For now, we set it. The Repository should ideally resolve this.
-            // But since this is a mapper, we do what we can.
-            // A better way is to leave it null here and let the Service/Repository resolve it, OR
-            // Expect the repository to merge/attach.
             entity.setCategory(category);
         }
 
