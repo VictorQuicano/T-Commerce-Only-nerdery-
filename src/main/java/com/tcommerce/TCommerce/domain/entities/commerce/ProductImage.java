@@ -7,12 +7,14 @@ import java.time.LocalDateTime;
 public class ProductImage implements BaseEntity {
     private String id;
     private String imageUrl;
+    private int displayOrder;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public ProductImage(String id, String imageUrl, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public ProductImage(String id, String imageUrl, int displayOrder, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.imageUrl = imageUrl;
+        this.displayOrder = displayOrder;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -32,6 +34,14 @@ public class ProductImage implements BaseEntity {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public int getDisplayOrder() {
+        return displayOrder;
+    }
+
+    public void setDisplayOrder(int displayOrder) {
+        this.displayOrder = displayOrder;
     }
 
     @Override

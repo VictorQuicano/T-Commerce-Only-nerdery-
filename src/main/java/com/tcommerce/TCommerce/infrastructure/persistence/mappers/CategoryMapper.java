@@ -11,8 +11,8 @@ public class CategoryMapper {
         if (entity == null) return null;
 
         return new Category(
-                entity.getId(),
                 entity.getName(),
+                entity.getId(),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt()
         );

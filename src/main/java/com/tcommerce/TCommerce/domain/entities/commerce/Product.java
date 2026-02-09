@@ -1,23 +1,32 @@
 package com.tcommerce.TCommerce.domain.entities.commerce;
 
 import com.tcommerce.TCommerce.domain.entities.BaseEntity;
-import jakarta.persistence.Id;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public class Product implements BaseEntity {
     private String id;
     private String name;
     private String description;
+    private BigDecimal price;
+    private String categoryId;
+    private Stock stock;
+    private List<ProductImage> images;
     private Optional<LocalDateTime> deletedAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public Product(String id, String name, String description, Optional<LocalDateTime> deletedAt, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Product(String id, String name, String description, BigDecimal price, String categoryId, Stock stock, List<ProductImage> images, Optional<LocalDateTime> deletedAt, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.name = name;
         this.description = description;
+        this.price = price;
+        this.categoryId = categoryId;
+        this.stock = stock;
+        this.images = images;
         this.deletedAt = deletedAt;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -46,6 +55,38 @@ public class Product implements BaseEntity {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public String getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(String categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public Stock getStock() {
+        return stock;
+    }
+
+    public void setStock(Stock stock) {
+        this.stock = stock;
+    }
+
+    public List<ProductImage> getImages() {
+        return images;
+    }
+
+    public void setImages(List<ProductImage> images) {
+        this.images = images;
     }
 
     public Optional<LocalDateTime> getDeletedAt() {
