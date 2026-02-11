@@ -61,11 +61,10 @@ public class ProductRepositoryImpl implements ProductRepository {
         System.out.println("Cursor: " + criteria.cursor());
         System.out.println("Forward: " + criteria.forward());
         System.out.println("Limit: " + criteria.limit());                                        
-        // 1. Construir cláusulas WHERE (filtros + cursor)
+
         Map<String, Object> parameters = new HashMap<>();
         List<String> whereConditions = new ArrayList<>();
 
-        // Filtros
         if (filter != null) {
             if (filter.name() != null && !filter.name().isEmpty()) {
                 whereConditions.add("p.name LIKE :name");
@@ -77,13 +76,10 @@ public class ProductRepositoryImpl implements ProductRepository {
             }
         }
 
-        // Determinar campo de ordenamiento y dirección
         String sortField = (sorterBy != null && !sorterBy.isBlank()) ? sorterBy : "id";
         boolean asc = sorterDirection == null || sorterDirection.equalsIgnoreCase("ASC");
-        // Para JPQL, usamos alias "p." + campo
         String sortFieldJpql = "p." + sortField;
 
-        // Procesar cursor
         String cursor = criteria.cursor();
         boolean forward = criteria.forward();
         int limit = Math.min(criteria.limit(), 100);
@@ -94,11 +90,9 @@ public class ProductRepositoryImpl implements ProductRepository {
             String lastId = cursorValue.id();
 
             if (forward) {
-                // after: (sortField > value) OR (sortField = value AND id > lastId)
                 whereConditions.add("(" + sortFieldJpql + " > :sortFieldValue OR (" +
                                     sortFieldJpql + " = :sortFieldValue AND p.id > :lastId))");
             } else {
-                // before: (sortField < value) OR (sortField = value AND id < lastId)
                 whereConditions.add("(" + sortFieldJpql + " < :sortFieldValue OR (" +
                                     sortFieldJpql + " = :sortFieldValue AND p.id < :lastId))");
             }
@@ -108,21 +102,15 @@ public class ProductRepositoryImpl implements ProductRepository {
 
         String whereClause = whereConditions.isEmpty() ? "" : " WHERE " + String.join(" AND ", whereConditions);
 
-        // 2. Construir ORDER BY
         String orderBy = " ORDER BY " + sortFieldJpql + (asc ? " ASC" : " DESC") + ", p.id ASC";
-        // Para backward, el orden de los resultados debe invertirse para mantener consistencia en los cursores
-        // pero la condición WHERE ya asegura que obtenemos los registros anteriores.
-        // Nota: si es backward, luego invertiremos la lista para que quede en orden ascendente según el criterio.
 
         String jpql = "SELECT p FROM ProductEntity p" + whereClause + orderBy;
         TypedQuery<ProductEntity> query = entityManager.createQuery(jpql, ProductEntity.class);
         parameters.forEach(query::setParameter);
 
-        // 3. Ejecutar consulta con límite + 1
         query.setMaxResults(limit + 1);
         List<ProductEntity> entities = query.getResultList();
 
-        // 4. Determinar si hay más páginas y ajustar lista
         boolean hasNextPage = false;
         boolean hasPreviousPage = false;
 
@@ -131,27 +119,20 @@ public class ProductRepositoryImpl implements ProductRepository {
             if (hasNextPage) {
                 entities = entities.subList(0, limit);
             }
-            // En paginación forward, se puede saber si hay página anterior solo si se proporcionó un cursor
             hasPreviousPage = cursor != null && !cursor.isEmpty();
         } else {
-            // En backward, el primer elemento de la lista puede ser el que corresponde al cursor
-            // (porque pedimos desde antes del cursor). Verificamos si hay más anteriores.
             hasPreviousPage = entities.size() > limit;
             if (hasPreviousPage) {
-                // Se eliminó el primer elemento porque es el "extra" (el más cercano al cursor)
                 entities = entities.subList(1, entities.size());
             }
-            // Invertimos la lista para que quede en orden ascendente (consistente con forward)
             Collections.reverse(entities);
-            hasNextPage = cursor != null && !cursor.isEmpty(); // si hay cursor, se puede ir adelante
+            hasNextPage = cursor != null && !cursor.isEmpty();
         }
 
-        // 5. Mapear a dominio
         List<Product> products = entities.stream()
                 .map(productMapper::toDomain)
                 .collect(Collectors.toList());
 
-        // 6. Generar cursores de inicio y fin
         String startCursor = null;
         String endCursor = null;
         if (!products.isEmpty()) {
@@ -161,38 +142,26 @@ public class ProductRepositoryImpl implements ProductRepository {
             endCursor = encodeCursor(lastProduct, sortField);
         }
 
-        // 7. Construir PageInfo (sin total/posiciones)
         PageInfo pageInfo = new PageInfo(hasNextPage, hasPreviousPage, startCursor, endCursor);
 
         return new PaginatedResult<>(products, pageInfo);
     }
 
-    /**
-     * Convierte el valor del cursor (String) al tipo correspondiente según el campo.
-     * Ejemplo: si sortField es "price", convertir a BigDecimal; si es "createdAt", a LocalDateTime, etc.
-     * Asume que el valor del cursor fue guardado en formato String; se debe adaptar a tu modelo.
-     */
     private Object convertToComparableType(String value, String sortField) {
-        // Implementa según los tipos de tus atributos
-        // Ejemplo básico:
         if ("price".equals(sortField)) {
             return new BigDecimal(value);
         } else if ("createdAt".equals(sortField)) {
             return LocalDateTime.parse(value);
         }
-        // Por defecto, tratar como String
         return value;
     }
 
-    /**
-     * Codifica un cursor a partir de una entidad Product y el campo de ordenamiento.
-     */
     private String encodeCursor(Product product, String sortField) {
         Object sortFieldValue = switch (sortField) {
             case "name" -> product.getName();
             case "price" -> product.getPrice().toString();
             case "createdAt" -> product.getCreatedAt().toString();
-            default -> product.getId(); // fallback: id como valor de ordenamiento
+            default -> product.getId();
         };
         return new CursorValue(sortFieldValue.toString(), product.getId()).encode();
     }
