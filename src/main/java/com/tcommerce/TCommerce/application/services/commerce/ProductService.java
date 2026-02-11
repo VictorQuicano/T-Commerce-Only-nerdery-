@@ -37,6 +37,9 @@ public class ProductService extends PageProcessor{
 
     public PaginatedResult<Product> getAllProducts(ProductPaginationRequest request) {
         PaginationCriteria criteria = processRequest(request);
+        System.out.println("\n\n[==========================]");
+        
+        System.out.println("CRITERIA: " + criteria);
         ProductFilter filter = new ProductFilter(request.name(), request.categoryId());
         return productRepository.findAll(criteria, filter, request.sortBy(), request.sortOrder());
     }

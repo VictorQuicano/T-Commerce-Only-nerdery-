@@ -6,52 +6,37 @@ import com.tcommerce.TCommerce.domain.models.PaginationCriteria;
 public abstract class PageProcessor {
     protected PaginationCriteria processRequest(Pageable request) {
 
-    Integer first = request.first();
-    Integer last = request.last();
-    String after = request.after();
-    String before = request.before();
+        Integer first = request.first();
+        Integer last = request.last();
+        String after = request.after();
+        String before = request.before();
+        System.out.println("REQUEST:\n  " + request);
 
-    // Validaciones de coherencia
-    if (first != null && last != null) {
-        throw new IllegalArgumentException("Cannot specify both 'first' and 'last'");
-    }
-
-    if (after != null && before != null) {
-        throw new IllegalArgumentException("Cannot specify both 'after' and 'before'");
-    }
-
-    int limit;
-    String cursor = null;
-    boolean forward;
-
-    if (first != null) {
-        forward = true;
-        limit = first;
-        cursor = after;
-
-        if (before != null) {
-            throw new IllegalArgumentException("'before' cannot be used with 'first'");
+        if (first != null && last != null) {
+            throw new IllegalArgumentException("Cannot specify both 'first' and 'last'");
         }
 
-    } else if (last != null) {
-        forward = false;
-        limit = last;
-        cursor = before;
-
-        if (after != null) {
-            throw new IllegalArgumentException("'after' cannot be used with 'last'");
+        if (after != null && before != null) {
+            throw new IllegalArgumentException("Cannot specify both 'after' and 'before'");
         }
 
-    } else {
-        // default pagination
-        forward = true;
-        limit = 20;
-        cursor = after; // only after makes sense in default forward
+        int limit;
+        String cursor = after != null ? after : before;
+        boolean forward = after != null;
+        boolean readInReverse = false;
+
+        if (first != null) {
+            limit = first;
+        } else if (last != null) {
+            limit = last;
+            readInReverse = true;
+        } else {
+            limit = 20;
+        }
+
+        limit = Math.min(limit, 100);
+
+        return new PaginationCriteria(limit, cursor, readInReverse, forward);
     }
-
-    limit = Math.min(limit, 100);
-
-    return new PaginationCriteria(limit, cursor, forward);
-}
 
 }
