@@ -76,7 +76,7 @@ public class DataSeeder implements CommandLineRunner {
                     faker.commerce().productName(),
                     faker.commerce().material() + " " + faker.commerce().productName(),
                     new BigDecimal(faker.commerce().price().replace(",", ".")),
-                    category.getId(),
+                    category,
                     stock,
                     images,
                     Optional.empty(),

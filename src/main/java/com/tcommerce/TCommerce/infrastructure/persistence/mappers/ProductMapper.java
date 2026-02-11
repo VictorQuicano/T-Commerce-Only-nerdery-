@@ -3,19 +3,23 @@ package com.tcommerce.TCommerce.infrastructure.persistence.mappers;
 import com.tcommerce.TCommerce.domain.entities.commerce.Product;
 import com.tcommerce.TCommerce.domain.entities.commerce.ProductImage;
 import com.tcommerce.TCommerce.domain.entities.commerce.Stock;
-import com.tcommerce.TCommerce.infrastructure.persistence.entities.commerce.CategoryEntity;
 import com.tcommerce.TCommerce.infrastructure.persistence.entities.commerce.ProductEntity;
 import com.tcommerce.TCommerce.infrastructure.persistence.entities.commerce.ProductImageEntity;
 import com.tcommerce.TCommerce.infrastructure.persistence.entities.commerce.StockEntity;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
 public class ProductMapper {
+
+    private final CategoryMapper categoryMapper;
+
+    public ProductMapper(CategoryMapper categoryMapper) {
+        this.categoryMapper = categoryMapper;
+    }
 
     public Product toDomain(ProductEntity entity) {
         if (entity == null) return null;
@@ -25,7 +29,7 @@ public class ProductMapper {
                 entity.getName(),
                 entity.getDescription(),
                 entity.getPrice(),
-                entity.getCategory() != null ? entity.getCategory().getId() : null,
+                categoryMapper.toDomain(entity.getCategory()),
                 toDomain(entity.getStock()),
                 toDomain(entity.getImages()),
                 entity.getDeletedAt() != null ? java.util.Optional.of(entity.getDeletedAt()) : java.util.Optional.empty(),
@@ -47,9 +51,8 @@ public class ProductMapper {
                 domain.getDeletedAt().orElse(null)
         );
 
-        if (domain.getCategoryId() != null) {
-            CategoryEntity category = new CategoryEntity(domain.getCategoryId(), "", null, null);
-            entity.setCategory(category);
+        if (domain.getCategory() != null) {
+            entity.setCategory(categoryMapper.toEntity(domain.getCategory()));
         }
 
         if (domain.getStock() != null) {

@@ -1,10 +1,15 @@
 package com.tcommerce.TCommerce.application.services.commerce;
 
+import com.tcommerce.TCommerce.application.query.ProductPaginationRequest;
+import com.tcommerce.TCommerce.application.query.ProductFilter;
+import com.tcommerce.TCommerce.application.services.common.PageProcessor;
 import com.tcommerce.TCommerce.domain.entities.commerce.Product;
 import com.tcommerce.TCommerce.domain.entities.commerce.ProductImage;
 import com.tcommerce.TCommerce.domain.entities.commerce.Stock;
 import com.tcommerce.TCommerce.domain.exceptions.AlreadyExistsException;
+import com.tcommerce.TCommerce.domain.repositories.interfaces.commerce.CategoryRepository;
 import com.tcommerce.TCommerce.domain.repositories.interfaces.commerce.ProductRepository;
+import com.tcommerce.TCommerce.domain.entities.commerce.Category;
 import com.tcommerce.TCommerce.interfaces.dto.commerce.product.CreateProductRequest;
 import com.tcommerce.TCommerce.interfaces.dto.commerce.product.UpdateProductRequest;
 import org.springframework.stereotype.Service;
@@ -12,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.tcommerce.TCommerce.domain.models.PaginatedResult;
 import com.tcommerce.TCommerce.domain.models.PaginationCriteria;
-import com.tcommerce.TCommerce.interfaces.dto.common.PaginationRequest;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -21,31 +25,20 @@ import java.util.UUID;
 
 @Service
 @Transactional(readOnly = true)
-public class ProductService {
+public class ProductService extends PageProcessor{
 
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
 
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository) {
         this.productRepository = productRepository;
-    }
+        this.categoryRepository = categoryRepository;
+    }   
 
-    public PaginatedResult<Product> getAllProducts(PaginationRequest request) {
-        int limit = 10;
-        String cursor = null;
-        boolean forward = true;
-
-        if (request.first() != null) {
-            limit = request.first();
-            cursor = request.after();
-            forward = true;
-        } else if (request.last() != null) {
-            limit = request.last();
-            cursor = request.before();
-            forward = false;
-        }
-
-        PaginationCriteria criteria = new PaginationCriteria(limit, cursor, forward);
-        return productRepository.findAll(criteria);
+    public PaginatedResult<Product> getAllProducts(ProductPaginationRequest request) {
+        PaginationCriteria criteria = processRequest(request);
+        ProductFilter filter = new ProductFilter(request.name(), request.categoryId());
+        return productRepository.findAll(criteria, filter, request.sortBy(), request.sortOrder());
     }
 
     public Product getProductById(String id) {
@@ -86,12 +79,15 @@ public class ProductService {
             }
         }
 
+        Category category = categoryRepository.findById(request.categoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found with id: " + request.categoryId()));
+
         Product product = new Product(
                 productId,
                 request.name(),
                 request.description(),
                 request.price(),
-                request.categoryId(),
+                category,
                 stock,
                 images,
                 java.util.Optional.empty(),
@@ -123,7 +119,9 @@ public class ProductService {
         }
 
         if (request.categoryId() != null) {
-            product.setCategoryId(request.categoryId());
+            Category category = categoryRepository.findById(request.categoryId())
+                    .orElseThrow(() -> new RuntimeException("Category not found with id: " + request.categoryId()));
+            product.setCategory(category);
         }
 
         if (request.stockQuantity() != null) {
