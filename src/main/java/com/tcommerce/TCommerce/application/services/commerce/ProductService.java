@@ -81,9 +81,9 @@ public class ProductService extends PageProcessor{
                 now
         );
 
-        productRepository.save(product);
+        product = productRepository.save(product);
         
-        List<ProductImage> images = productImageService.createProductImages(productId, request.images());
+        List<ProductImage> images = productImageService.createProductImages(product.getId(), request.images());
         product.setImages(images);
 
         return product;

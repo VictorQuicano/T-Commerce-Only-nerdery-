@@ -8,17 +8,17 @@ import com.tcommerce.TCommerce.infrastructure.persistence.entities.commerce.Prod
 import com.tcommerce.TCommerce.infrastructure.persistence.entities.commerce.StockEntity;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class ProductMapper {
 
     private final CategoryMapper categoryMapper;
+    private final ProductImageMapper productImageMapper;
 
-    public ProductMapper(CategoryMapper categoryMapper) {
+    public ProductMapper(CategoryMapper categoryMapper, ProductImageMapper productImageMapper) {
         this.categoryMapper = categoryMapper;
+        this.productImageMapper = productImageMapper;
     }
 
     public Product toDomain(ProductEntity entity) {
@@ -31,7 +31,7 @@ public class ProductMapper {
                 entity.getPrice(),
                 categoryMapper.toDomain(entity.getCategory()),
                 toDomain(entity.getStock()),
-                toDomain(entity.getImages()),
+                productImageMapper.toDomainList(entity.getImages()),
                 entity.getDeletedAt(),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt()
@@ -61,18 +61,9 @@ public class ProductMapper {
             entity.setStock(stockEntity);
         }
 
-        if (domain.getImages() != null) {
-            List<ProductImageEntity> imageEntities = domain.getImages().stream()
-                    .map(img -> {
-                        ProductImageEntity imgEntity = toEntity(img);
-                        imgEntity.setProduct(entity); // Set parent reference
-                        return imgEntity;
-                    })
-                    .collect(Collectors.toList());
-            entity.setImages(imageEntities);
-        } else {
-            entity.setImages(new ArrayList<>());
-        }
+        List<ProductImageEntity> imageEntities = productImageMapper.toEntityList(domain.getImages());
+        imageEntities.forEach(imageEntity -> imageEntity.setProduct(entity));
+        entity.setImages(imageEntities);
 
         return entity;
     }
@@ -94,37 +85,6 @@ public class ProductMapper {
                 domain.getQuantity(),
                 domain.getCreatedAt(),
                 domain.getUpdatedAt()
-        );
-    }
-
-    private List<ProductImage> toDomain(List<ProductImageEntity> entities) {
-        if (entities == null) return new ArrayList<>();
-        return entities.stream()
-                .map(this::toDomain)
-                .collect(Collectors.toList());
-    }
-
-    private ProductImage toDomain(ProductImageEntity entity) {
-        if (entity == null) return null;
-        return new ProductImage(
-                entity.getId(),
-                entity.getProduct() != null ? entity.getProduct().getId() : null,
-                entity.getImageUrl(),
-                entity.getDisplayOrder(),
-                entity.getCreatedAt(),
-                entity.getUpdatedAt()
-        );
-    }
-
-    private ProductImageEntity toEntity(ProductImage domain) {
-        if (domain == null) return null;
-        return new ProductImageEntity(
-            domain.getId(),
-            domain.getCreatedAt(),
-            domain.getUpdatedAt(),
-            domain.getImageUrl(),
-            null, // product set in parent
-            domain.getDisplayOrder()
         );
     }
 }

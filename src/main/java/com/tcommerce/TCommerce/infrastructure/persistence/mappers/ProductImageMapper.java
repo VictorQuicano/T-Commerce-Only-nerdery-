@@ -3,6 +3,7 @@ package com.tcommerce.TCommerce.infrastructure.persistence.mappers;
 import com.tcommerce.TCommerce.domain.entities.commerce.ProductImage;
 import com.tcommerce.TCommerce.infrastructure.persistence.entities.commerce.ProductImageEntity;
 import org.springframework.stereotype.Component;
+import java.util.List;
 
 @Component
 public class ProductImageMapper {
@@ -29,5 +30,14 @@ public class ProductImageMapper {
             null, // product needs to be set separately if needed
             domain.getDisplayOrder()
         );
+    }
+    public List<ProductImage> toDomainList(List<ProductImageEntity> entities) {
+        if (entities == null) return null;
+        return entities.stream().map(this::toDomain).toList();
+    }
+
+    public List<ProductImageEntity> toEntityList(List<ProductImage> domains) {
+        if (domains == null) return null;
+        return domains.stream().map(this::toEntity).toList();
     }
 }

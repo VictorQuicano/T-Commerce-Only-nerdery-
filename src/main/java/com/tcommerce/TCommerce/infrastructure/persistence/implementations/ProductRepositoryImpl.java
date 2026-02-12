@@ -61,7 +61,7 @@ public class ProductRepositoryImpl implements ProductRepository {
 
         if (filter != null) {
             if (filter.name() != null && !filter.name().isEmpty()) {
-                whereConditions.add("p.name LIKE :name");
+                whereConditions.add("p.name ILIKE :name");
                 parameters.put("name", "%" + filter.name() + "%");
             }
             if (filter.categoryId() != null && !filter.categoryId().isEmpty()) {

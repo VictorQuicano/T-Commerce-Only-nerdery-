@@ -7,7 +7,6 @@ import com.google.cloud.WriteChannel;
 import com.tcommerce.TCommerce.config.BucketConfig;
 import com.tcommerce.TCommerce.domain.services.StorageService;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -34,14 +33,14 @@ public class GCPStorageService implements StorageService {
     @Override
     public String uploadImage(MultipartFile file, String productId) {
         try {
-            String originalFilename = StringUtils.cleanPath(file.getOriginalFilename());
+            String originalFilename = file.getOriginalFilename();
             String extension = "";
-            int dotIndex = originalFilename.lastIndexOf('.');
-            if (dotIndex > 0) {
-                extension = originalFilename.substring(dotIndex);
+            if (originalFilename != null && originalFilename.contains(".")) {
+                extension = originalFilename.substring(originalFilename.lastIndexOf("."));
             }
+            
             String blobName = String.format("%s/%s/%s%s",
-                    bucketConfig.getSubdirectory(),
+                    bucketConfig.getSubdirectory() != null ? bucketConfig.getSubdirectory() : "images",
                     productId,
                     UUID.randomUUID(),
                     extension);

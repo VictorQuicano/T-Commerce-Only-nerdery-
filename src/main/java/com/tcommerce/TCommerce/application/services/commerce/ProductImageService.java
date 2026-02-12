@@ -33,7 +33,6 @@ public class ProductImageService {
 
         List<ProductImage> images = new ArrayList<>();
         int displayOrder = productImageRepository.countByProductId(productId) + 1;
-
         for (MultipartFile file : files) {
             String imageUrl = storageService.uploadImage(file, productId);
 

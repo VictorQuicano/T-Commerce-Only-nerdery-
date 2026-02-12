@@ -15,4 +15,5 @@ public interface ProductRepository extends CRUDRepository<Product> {
     boolean existsByName(String name);
     PaginatedResult<Product> findAll(PaginationCriteria criteria, ProductFilter filter, String sorterBy, String sorterDirection );
     boolean softDeleteById(String id);
+    
 }
