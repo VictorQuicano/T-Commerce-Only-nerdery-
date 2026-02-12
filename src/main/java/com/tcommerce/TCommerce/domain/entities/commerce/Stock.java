@@ -2,15 +2,16 @@ package com.tcommerce.TCommerce.domain.entities.commerce;
 
 import com.tcommerce.TCommerce.domain.entities.BaseEntity;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 public class Stock implements BaseEntity {
     private String id;
-    public int quantity;
+    private BigInteger quantity;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public Stock(String id, int quantity, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Stock(String id, BigInteger quantity, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.quantity = quantity;
         this.createdAt = createdAt;
@@ -26,11 +27,11 @@ public class Stock implements BaseEntity {
         this.id = id;
     }
 
-    public int getQuantity() {
+    public BigInteger getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(BigInteger quantity) {
         this.quantity = quantity;
     }
 

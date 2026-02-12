@@ -11,6 +11,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;    
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +41,7 @@ public class DataSeeder implements CommandLineRunner {
         System.out.println("Seeding data...");
 
         List<Category> categories = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 2; i++) {
             Category category = new Category(
                     faker.commerce().department(),
                     UUID.randomUUID().toString(),
@@ -50,14 +51,15 @@ public class DataSeeder implements CommandLineRunner {
             categories.add(categoryRepository.save(category));
         }
 
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 4; i++) {
             Category category = categories.get(faker.random().nextInt(categories.size()));
             LocalDateTime now = LocalDateTime.now();
             String productId = UUID.randomUUID().toString();
+            BigInteger stockQuantity = BigInteger.valueOf(faker.number().numberBetween(1, 100));
 
             Stock stock = new Stock(
                     UUID.randomUUID().toString(),
-                    faker.number().numberBetween(1, 100),
+                    stockQuantity,
                     now,
                     now
             );

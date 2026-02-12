@@ -3,13 +3,15 @@ package com.tcommerce.TCommerce.infrastructure.persistence.entities.commerce;
 import com.tcommerce.TCommerce.infrastructure.persistence.entities.BaseEntity;
 import jakarta.persistence.*;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
+
 
 @Entity
 @Table(name="stock_levels")
 public class StockEntity extends BaseEntity {
     @Column
-    private int quantity;
+    private BigInteger quantity;
 
     @OneToOne
     @JoinColumn(name = "product_id", unique = true)
@@ -17,16 +19,16 @@ public class StockEntity extends BaseEntity {
 
     public StockEntity(){}
 
-    public StockEntity(String id, LocalDateTime createdAt, LocalDateTime updatedAt, int quantity) {
+    public StockEntity(String id, BigInteger quantity, LocalDateTime createdAt, LocalDateTime updatedAt) {
         super(id, createdAt, updatedAt);
         this.quantity = quantity;
     }
 
-    public int getQuantity() {
+    public BigInteger getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(BigInteger quantity) {
         this.quantity = quantity;
     }
 

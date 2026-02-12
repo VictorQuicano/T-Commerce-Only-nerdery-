@@ -91,9 +91,9 @@ public class ProductMapper {
         if (domain == null) return null;
         return new StockEntity(
                 domain.getId(),
+                domain.getQuantity(),
                 domain.getCreatedAt(),
-                domain.getUpdatedAt(),
-                domain.getQuantity()
+                domain.getUpdatedAt()
         );
     }
 

@@ -18,10 +18,13 @@ import org.springframework.transaction.annotation.Transactional;
 import com.tcommerce.TCommerce.domain.models.PaginatedResult;
 import com.tcommerce.TCommerce.domain.models.PaginationCriteria;
 
+import com.tcommerce.TCommerce.domain.services.StorageService;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -29,17 +32,18 @@ public class ProductService extends PageProcessor{
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final StorageService storageService;
 
-    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository) {
+    public ProductService(ProductRepository productRepository, 
+                          CategoryRepository categoryRepository,
+                          StorageService storageService) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
+        this.storageService = storageService;
     }   
 
     public PaginatedResult<Product> getAllProducts(ProductPaginationRequest request) {
         PaginationCriteria criteria = processRequest(request);
-        System.out.println("\n\n[==========================]");
-        
-        System.out.println("CRITERIA: " + criteria);
         ProductFilter filter = new ProductFilter(request.name(), request.categoryId());
         return productRepository.findAll(criteria, filter, request.sortBy(), request.sortOrder());
     }
@@ -70,11 +74,12 @@ public class ProductService extends PageProcessor{
         );
 
         List<ProductImage> images = new ArrayList<>();
-        if (request.imageUrls() != null) {
-            for (int i = 0; i < request.imageUrls().size(); i++) {
+        if (request.images() != null && !request.images().isEmpty()) {
+            List<String> imageUrls = storageService.uploadFiles(request.images());
+            for (int i = 0; i < imageUrls.size(); i++) {
                 images.add(new ProductImage(
                         UUID.randomUUID().toString(),
-                        request.imageUrls().get(i),
+                        imageUrls.get(i),
                         i,
                         now,
                         now
@@ -136,12 +141,13 @@ public class ProductService extends PageProcessor{
             }
         }
 
-        if (request.imageUrls() != null) {
+        if (request.images() != null && !request.images().isEmpty()) {
+            List<String> imageUrls = storageService.uploadFiles(request.images());
             List<ProductImage> newImages = new ArrayList<>();
-            for (int i = 0; i < request.imageUrls().size(); i++) {
+            for (int i = 0; i < imageUrls.size(); i++) {
                  newImages.add(new ProductImage(
                         UUID.randomUUID().toString(),
-                        request.imageUrls().get(i),
+                        imageUrls.get(i),
                         i,
                         now,
                         now

@@ -10,7 +10,6 @@ public abstract class PageProcessor {
         Integer last = request.last();
         String after = request.after();
         String before = request.before();
-        System.out.println("REQUEST:\n  " + request);
 
         if (first != null && last != null) {
             throw new IllegalArgumentException("Cannot specify both 'first' and 'last'");

@@ -6,14 +6,20 @@ import com.tcommerce.TCommerce.application.services.commerce.ProductService;
 import com.tcommerce.TCommerce.domain.entities.commerce.Product;
 import com.tcommerce.TCommerce.domain.models.PaginatedResult;
 import com.tcommerce.TCommerce.interfaces.dto.commerce.category.CategoryResponse;
+import com.tcommerce.TCommerce.interfaces.dto.commerce.product.ProductFullResponse;
+import com.tcommerce.TCommerce.interfaces.dto.commerce.product.ProductImageResponse;
+import com.tcommerce.TCommerce.interfaces.dto.commerce.product.ProductStockResponse;
+import com.tcommerce.TCommerce.interfaces.dto.commerce.category.CategoryShortResponse;
 import com.tcommerce.TCommerce.interfaces.dto.commerce.product.CreateProductRequest;
-import com.tcommerce.TCommerce.interfaces.dto.commerce.product.ProductResponse;
+import com.tcommerce.TCommerce.interfaces.dto.commerce.product.ProductListResponse;
 import com.tcommerce.TCommerce.interfaces.dto.commerce.product.UpdateProductRequest;
 import com.tcommerce.TCommerce.interfaces.dto.common.PaginatedResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+
+import java.math.BigInteger;
 import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,42 +36,36 @@ public class ProductController{
     }
 
     @GetMapping
-    public ResponseEntity<PaginatedResponse<ProductResponse>> getAllProducts(ProductPaginationRequest request) {
+    public ResponseEntity<PaginatedResponse<ProductListResponse>> getAllProducts(ProductPaginationRequest request) {
         PaginatedResult<Product> result = productService.getAllProducts(request);
-        List<ProductResponse> responses = result.data().stream()
+        List<ProductListResponse> responses = result.data().stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(new PaginatedResponse<>(responses, result.pageInfo()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductResponse> getProductById(@PathVariable String id) {
+    public ResponseEntity<ProductFullResponse> getProductById(@PathVariable String id) {
         Product product = productService.getProductById(id);
-        return ResponseEntity.ok(mapToResponse(product));
+        return ResponseEntity.ok(mapToFullResponse(product));
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<List<ProductResponse>> searchProducts(@RequestParam String name) {
-        List<Product> products = productService.getProductsByName(name);
-        List<ProductResponse> response = products.stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(response);
-    }
-
-    @PostMapping
-    public ResponseEntity<ProductResponse> createProduct(@Valid @RequestBody CreateProductRequest request) {
+    @PostMapping(consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ProductFullResponse> createProduct(@Valid @ModelAttribute CreateProductRequest request) {
         Product product = productService.createProduct(request);
         return ResponseEntity.created(URI.create("/products/" + product.getId()))
-                .body(mapToResponse(product));
+                .body(mapToFullResponse(product));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ProductResponse> updateProduct(
+    @PutMapping(value = "/{id}", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ProductFullResponse> updateProduct(
             @PathVariable String id,
-            @Valid @RequestBody UpdateProductRequest request) {
+            @Valid @ModelAttribute UpdateProductRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("Request body cannot be empty");
+        }
         Product product = productService.updateProduct(id, request);
-        return ResponseEntity.ok(mapToResponse(product));
+        return ResponseEntity.ok(mapToFullResponse(product));
     }
 
     @DeleteMapping("/{id}")
@@ -74,10 +74,19 @@ public class ProductController{
         return ResponseEntity.noContent().build();
     }
 
-    private ProductResponse mapToResponse(Product product) {
-        List<String> imageUrls = product.getImages() != null
-                ? product.getImages().stream().map(img -> img.getImageUrl()).collect(Collectors.toList())
-                : List.of();
+    private ProductFullResponse mapToFullResponse(Product product) {
+        List<ProductImageResponse> imageResponses = product.getImages() != null
+        ? product.getImages().stream()
+            .map(img -> new ProductImageResponse(
+                    img.getId(),
+                    img.getImageUrl(),
+                    img.getDisplayOrder(),
+                    img.getCreatedAt(),
+                    img.getUpdatedAt()
+            ))
+            .collect(Collectors.toList())
+        : List.of();
+
         CategoryResponse categoryResponse = product.getCategory() != null ? new CategoryResponse(
                 product.getCategory().getId(),
                 product.getCategory().getName(),
@@ -85,13 +94,42 @@ public class ProductController{
                 product.getCategory().getUpdatedAt()
         ) : null;
 
-        return new ProductResponse(
+        ProductStockResponse stockResponse = product.getStock() != null ? new ProductStockResponse(
+                product.getStock().getQuantity(),
+                product.getStock().getUpdatedAt()
+        ) : null;
+
+        return new ProductFullResponse(
                 product.getId(),
                 product.getName(),
                 product.getDescription(),
                 product.getPrice(),
                 categoryResponse,
-                product.getStock() != null ? product.getStock().getQuantity() : 0,
+                stockResponse,
+                imageResponses,
+                product.getCreatedAt(),
+                product.getUpdatedAt()
+        );
+    }
+
+    private ProductListResponse mapToResponse(Product product) {
+        List<String> imageUrls = product.getImages() != null
+                ? product.getImages().stream().map(img -> img.getImageUrl()).collect(Collectors.toList())
+                : List.of();
+        CategoryShortResponse categoryResponse = product.getCategory() != null ? new CategoryShortResponse(
+                product.getCategory().getId(),
+                product.getCategory().getName()
+        ) : null;
+
+        BigInteger stockQuantity = product.getStock() != null ? product.getStock().getQuantity() : BigInteger.ZERO;
+
+        return new ProductListResponse(
+                product.getId(),
+                product.getName(),
+                product.getDescription(),
+                product.getPrice(),
+                categoryResponse,
+                stockQuantity,
                 imageUrls,
                 product.getCreatedAt(),
                 product.getUpdatedAt()
