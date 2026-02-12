@@ -15,7 +15,6 @@ import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Component
@@ -81,7 +80,7 @@ public class DataSeeder implements CommandLineRunner {
                     category,
                     stock,
                     images,
-                    Optional.empty(),
+                    null,
                     now,
                     now
             );

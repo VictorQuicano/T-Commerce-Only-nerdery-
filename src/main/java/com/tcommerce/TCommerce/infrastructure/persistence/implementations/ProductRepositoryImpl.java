@@ -14,11 +14,12 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import org.springframework.stereotype.Repository;
-
+    
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public class ProductRepositoryImpl implements ProductRepository {
@@ -272,5 +273,12 @@ public class ProductRepositoryImpl implements ProductRepository {
     @Override
     public boolean existsByName(String name) {
         return jpaProductRepository.existsByName(name);
+    }
+
+    @Override
+    @Transactional
+    public boolean softDeleteById(String id) {
+        int affectedRows = jpaProductRepository.softDeleteById(id, LocalDateTime.now());
+        return affectedRows > 0;
     }
 }

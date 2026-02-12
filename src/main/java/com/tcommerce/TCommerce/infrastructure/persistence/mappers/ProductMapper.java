@@ -32,7 +32,7 @@ public class ProductMapper {
                 categoryMapper.toDomain(entity.getCategory()),
                 toDomain(entity.getStock()),
                 toDomain(entity.getImages()),
-                entity.getDeletedAt() != null ? java.util.Optional.of(entity.getDeletedAt()) : java.util.Optional.empty(),
+                entity.getDeletedAt(),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt()
         );
@@ -108,6 +108,7 @@ public class ProductMapper {
         if (entity == null) return null;
         return new ProductImage(
                 entity.getId(),
+                entity.getProduct() != null ? entity.getProduct().getId() : null,
                 entity.getImageUrl(),
                 entity.getDisplayOrder(),
                 entity.getCreatedAt(),
