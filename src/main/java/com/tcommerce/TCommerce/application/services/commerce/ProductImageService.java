@@ -9,7 +9,6 @@ import com.tcommerce.TCommerce.domain.entities.commerce.ProductImage;
 import com.tcommerce.TCommerce.domain.services.StorageService;
 import com.tcommerce.TCommerce.domain.repositories.interfaces.commerce.ProductImageRepository;
 import java.util.ArrayList;
-import java.time.LocalDateTime;
 
 import org.springframework.web.multipart.MultipartFile;
 
