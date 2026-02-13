@@ -1,4 +1,4 @@
-package com.tcommerce.TCommerce.infrastructure.persistence.implementations;
+package com.tcommerce.TCommerce.domain.repositories.implementations.commerce;
 
 import com.tcommerce.TCommerce.domain.entities.commerce.Product;
 import com.tcommerce.TCommerce.domain.models.PageInfo;
@@ -6,7 +6,7 @@ import com.tcommerce.TCommerce.domain.models.PaginatedResult;
 import com.tcommerce.TCommerce.domain.models.PaginationCriteria;
 import com.tcommerce.TCommerce.domain.repositories.interfaces.commerce.ProductRepository;
 import com.tcommerce.TCommerce.infrastructure.persistence.entities.commerce.ProductEntity;
-import com.tcommerce.TCommerce.infrastructure.persistence.mappers.ProductMapper;
+import com.tcommerce.TCommerce.infrastructure.persistence.mappers.commerce.ProductMapper;
 import com.tcommerce.TCommerce.infrastructure.persistence.repositories.JpaProductRepository;
 import com.tcommerce.TCommerce.infrastructure.persistence.utils.CursorValue;
 import com.tcommerce.TCommerce.application.query.ProductFilter;
@@ -240,12 +240,14 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     @Override
+    @Transactional
     public Optional<Product> findById(String id) {
         return jpaProductRepository.findById(id)
                 .map(productMapper::toDomain);
     }
 
     @Override
+    @Transactional
     public Product save(Product product) {
         ProductEntity entity = productMapper.toEntity(product);
         ProductEntity savedEntity = jpaProductRepository.save(entity);

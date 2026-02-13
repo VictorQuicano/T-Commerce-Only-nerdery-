@@ -2,7 +2,7 @@ services:
   db:
     image: 'postgres:latest'
     environment:
-      - 'POSTGRES_DB=tcommerce'
+      - 'POSTGRES_DB=tcommerce_full'
       - 'POSTGRES_PASSWORD=password'
       - 'POSTGRES_USER=user'
     ports:

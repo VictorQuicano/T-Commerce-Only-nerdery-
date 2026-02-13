@@ -40,7 +40,7 @@ public class DataSeeder implements CommandLineRunner {
         System.out.println("Seeding data...");
 
         List<Category> categories = new ArrayList<>();
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 5; i++) {
             Category category = new Category(
                     faker.commerce().department(),
                     UUID.randomUUID().toString(),
@@ -50,7 +50,7 @@ public class DataSeeder implements CommandLineRunner {
             categories.add(categoryRepository.save(category));
         }
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 100; i++) {
             Category category = categories.get(faker.random().nextInt(categories.size()));
             LocalDateTime now = LocalDateTime.now();
             String productId = UUID.randomUUID().toString();

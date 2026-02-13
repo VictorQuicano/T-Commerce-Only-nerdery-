@@ -1,7 +1,6 @@
-package com.tcommerce.TCommerce.infrastructure.persistence.mappers;
+package com.tcommerce.TCommerce.infrastructure.persistence.mappers.commerce;
 
 import com.tcommerce.TCommerce.domain.entities.commerce.Product;
-import com.tcommerce.TCommerce.domain.entities.commerce.ProductImage;
 import com.tcommerce.TCommerce.domain.entities.commerce.Stock;
 import com.tcommerce.TCommerce.infrastructure.persistence.entities.commerce.ProductEntity;
 import com.tcommerce.TCommerce.infrastructure.persistence.entities.commerce.ProductImageEntity;

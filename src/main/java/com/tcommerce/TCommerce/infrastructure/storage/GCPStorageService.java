@@ -63,7 +63,7 @@ public class GCPStorageService implements StorageService {
                     bucketConfig.getBucketName(), blobName);
 
         } catch (IOException e) {
-            throw new RuntimeException("Error al subir la imagen a GCS", e);
+            throw new RuntimeException("Error uploading image to GCS", e);
         }
     }
 
@@ -87,7 +87,7 @@ public class GCPStorageService implements StorageService {
         BlobId blobId = BlobId.of(bucketName, blobName);
         boolean deleted = storage.delete(blobId);
         if (!deleted) {
-            throw new RuntimeException("No se pudo eliminar el archivo: " + fileUrl);
+            throw new RuntimeException("Could not delete file: " + fileUrl);
         }
     }
 }

@@ -1,9 +1,9 @@
-package com.tcommerce.TCommerce.infrastructure.persistence.implementations;
+package com.tcommerce.TCommerce.domain.repositories.implementations.commerce;
 
 import com.tcommerce.TCommerce.domain.entities.commerce.Category;
 import com.tcommerce.TCommerce.domain.repositories.interfaces.commerce.CategoryRepository;
 import com.tcommerce.TCommerce.infrastructure.persistence.entities.commerce.CategoryEntity;
-import com.tcommerce.TCommerce.infrastructure.persistence.mappers.CategoryMapper;
+import com.tcommerce.TCommerce.infrastructure.persistence.mappers.commerce.CategoryMapper;
 import com.tcommerce.TCommerce.infrastructure.persistence.repositories.JpaCategoryRepository;
 import org.springframework.stereotype.Repository;
 
