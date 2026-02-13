@@ -3,11 +3,13 @@ package com.tcommerce.TCommerce.domain.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -67,6 +69,14 @@ public class GlobalExceptionHandler {
         problemDetail.setProperty("path", request.getDescription(false).replace("uri=", ""));
 
         return problemDetail;
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ProblemDetail> handleMaxUpload(MaxUploadSizeExceededException ex) {
+        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.PAYLOAD_TOO_LARGE);
+        problem.setTitle("File too large");
+        problem.setDetail("The uploaded file exceeds the maximum allowed size.");
+        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(problem);
     }
 
     @ExceptionHandler(Exception.class)
