@@ -15,7 +15,7 @@ public interface JpaProductRepository extends JpaRepository<ProductEntity, Strin
     Optional<ProductEntity> findByName(String name);
     List<ProductEntity> findByNameContainingIgnoreCase(String name);
     boolean existsByName(String name);
-    // TODO: Change this to soft delete
+
     @Modifying
     @Query("""
         UPDATE ProductEntity p
