@@ -3,7 +3,7 @@ package com.tcommerce.TCommerce.domain.repositories.implementations.auth;
 import com.tcommerce.TCommerce.domain.entities.auth.User;
 import com.tcommerce.TCommerce.domain.repositories.interfaces.auth.UserRepository;
 import com.tcommerce.TCommerce.infrastructure.persistence.mappers.auth.UserMapper;
-import com.tcommerce.TCommerce.infrastructure.persistence.repositories.JpaUserRepository;
+import com.tcommerce.TCommerce.infrastructure.persistence.repositories.auth.JpaUserRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

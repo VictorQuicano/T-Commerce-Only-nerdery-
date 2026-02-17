@@ -1,6 +1,6 @@
 package com.tcommerce.TCommerce.domain.repositories.implementations.auth;
 
-import com.tcommerce.TCommerce.infrastructure.persistence.repositories.JpaRefreshTokenRepository;
+import com.tcommerce.TCommerce.infrastructure.persistence.repositories.commerce.JpaRefreshTokenRepository;
 import com.tcommerce.TCommerce.infrastructure.persistence.mappers.auth.RefreshTokenMapper;
 import com.tcommerce.TCommerce.domain.repositories.interfaces.auth.RefreshTokenRepository;
 import org.springframework.stereotype.Repository;

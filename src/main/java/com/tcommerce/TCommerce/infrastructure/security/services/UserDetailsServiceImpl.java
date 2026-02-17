@@ -1,7 +1,7 @@
 package com.tcommerce.TCommerce.infrastructure.security.services;
 
 import com.tcommerce.TCommerce.infrastructure.persistence.entities.auth.UserEntity;
-import com.tcommerce.TCommerce.infrastructure.persistence.repositories.JpaUserRepository;
+import com.tcommerce.TCommerce.infrastructure.persistence.repositories.auth.JpaUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

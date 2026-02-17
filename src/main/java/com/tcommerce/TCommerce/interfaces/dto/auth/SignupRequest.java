@@ -31,7 +31,7 @@ public class SignupRequest {
     private String email;
 
     @NotBlank(message = "Password is required")
-    @Size(min = 6, max = 40)
+    @Size(min = 8, max = 20)
     @StrongPassword
     private String password;
 }

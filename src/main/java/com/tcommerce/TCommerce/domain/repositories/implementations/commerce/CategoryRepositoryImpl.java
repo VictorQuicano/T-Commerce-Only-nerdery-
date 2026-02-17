@@ -4,7 +4,7 @@ import com.tcommerce.TCommerce.domain.entities.commerce.Category;
 import com.tcommerce.TCommerce.domain.repositories.interfaces.commerce.CategoryRepository;
 import com.tcommerce.TCommerce.infrastructure.persistence.entities.commerce.CategoryEntity;
 import com.tcommerce.TCommerce.infrastructure.persistence.mappers.commerce.CategoryMapper;
-import com.tcommerce.TCommerce.infrastructure.persistence.repositories.JpaCategoryRepository;
+import com.tcommerce.TCommerce.infrastructure.persistence.repositories.commerce.JpaCategoryRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

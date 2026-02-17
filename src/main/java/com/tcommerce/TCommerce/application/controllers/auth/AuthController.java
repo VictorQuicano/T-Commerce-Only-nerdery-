@@ -31,7 +31,7 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
 
-    @PostMapping("/register")
+    @PostMapping("/sign-up")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody SignupRequest request) {
         AuthResponse authenticationResponse = authenticationService.registerUser(request);
         ResponseCookie jwtCookie = jwtService.generateJwtCookie(authenticationResponse.getAccessToken());
@@ -42,7 +42,7 @@ public class AuthController {
                 .body(authenticationResponse);
     }
 
-    @PostMapping("/authenticate")
+    @PostMapping("/sign-in")
     public ResponseEntity<AuthResponse> authenticate(@RequestBody LoginRequest request) {
         AuthResponse authenticationResponse = authenticationService.authenticate(request);
         ResponseCookie jwtCookie = jwtService.generateJwtCookie(authenticationResponse.getAccessToken());

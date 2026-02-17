@@ -1,4 +1,4 @@
-package com.tcommerce.TCommerce.infrastructure.persistence.repositories;
+package com.tcommerce.TCommerce.infrastructure.persistence.repositories.commerce;
 
 import com.tcommerce.TCommerce.infrastructure.persistence.entities.commerce.CategoryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

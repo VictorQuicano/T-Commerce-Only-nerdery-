@@ -4,8 +4,8 @@ import com.tcommerce.TCommerce.domain.entities.commerce.ProductImage;
 import com.tcommerce.TCommerce.domain.repositories.interfaces.commerce.ProductImageRepository;
 import com.tcommerce.TCommerce.infrastructure.persistence.entities.commerce.ProductImageEntity;
 import com.tcommerce.TCommerce.infrastructure.persistence.mappers.commerce.ProductImageMapper;
-import com.tcommerce.TCommerce.infrastructure.persistence.repositories.JpaProductImageRepository;
-import com.tcommerce.TCommerce.infrastructure.persistence.repositories.JpaProductRepository;
+import com.tcommerce.TCommerce.infrastructure.persistence.repositories.commerce.JpaProductImageRepository;
+import com.tcommerce.TCommerce.infrastructure.persistence.repositories.commerce.JpaProductRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

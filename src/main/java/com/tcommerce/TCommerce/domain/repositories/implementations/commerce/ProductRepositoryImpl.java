@@ -7,7 +7,7 @@ import com.tcommerce.TCommerce.domain.models.PaginationCriteria;
 import com.tcommerce.TCommerce.domain.repositories.interfaces.commerce.ProductRepository;
 import com.tcommerce.TCommerce.infrastructure.persistence.entities.commerce.ProductEntity;
 import com.tcommerce.TCommerce.infrastructure.persistence.mappers.commerce.ProductMapper;
-import com.tcommerce.TCommerce.infrastructure.persistence.repositories.JpaProductRepository;
+import com.tcommerce.TCommerce.infrastructure.persistence.repositories.commerce.JpaProductRepository;
 import com.tcommerce.TCommerce.infrastructure.persistence.utils.CursorValue;
 import com.tcommerce.TCommerce.application.query.ProductFilter;
 import jakarta.persistence.EntityManager;

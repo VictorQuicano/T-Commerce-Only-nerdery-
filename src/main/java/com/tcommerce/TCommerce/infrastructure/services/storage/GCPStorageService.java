@@ -1,4 +1,4 @@
-package com.tcommerce.TCommerce.infrastructure.storage;
+package com.tcommerce.TCommerce.infrastructure.services.storage;
 
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;

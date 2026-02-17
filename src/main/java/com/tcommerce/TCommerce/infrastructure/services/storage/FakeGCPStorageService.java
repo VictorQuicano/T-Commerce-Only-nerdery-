@@ -1,4 +1,4 @@
-package com.tcommerce.TCommerce.infrastructure.storage;
+package com.tcommerce.TCommerce.infrastructure.services.storage;
 
 import com.tcommerce.TCommerce.domain.services.StorageService;
 import org.springframework.stereotype.Service;
