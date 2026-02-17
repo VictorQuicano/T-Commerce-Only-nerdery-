@@ -18,13 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.tcommerce.TCommerce.domain.models.PaginatedResult;
 import com.tcommerce.TCommerce.domain.models.PaginationCriteria;
 
-import com.tcommerce.TCommerce.domain.services.StorageService;
-
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -32,14 +28,14 @@ public class ProductService extends PageProcessor{
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
-    private final StorageService storageService;
+    private final ProductImageService productImageService; 
 
     public ProductService(ProductRepository productRepository, 
                           CategoryRepository categoryRepository,
-                          StorageService storageService) {
+                          ProductImageService productImageService) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
-        this.storageService = storageService;
+        this.productImageService = productImageService;
     }   
 
     public PaginatedResult<Product> getAllProducts(ProductPaginationRequest request) {
@@ -72,24 +68,8 @@ public class ProductService extends PageProcessor{
                 now,
                 now
         );
-
-        List<ProductImage> images = new ArrayList<>();
-        if (request.images() != null && !request.images().isEmpty()) {
-            List<String> imageUrls = storageService.uploadFiles(request.images());
-            for (int i = 0; i < imageUrls.size(); i++) {
-                images.add(new ProductImage(
-                        UUID.randomUUID().toString(),
-                        imageUrls.get(i),
-                        i,
-                        now,
-                        now
-                ));
-            }
-        }
-
         Category category = categoryRepository.findById(request.categoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found with id: " + request.categoryId()));
-
         Product product = new Product(
                 productId,
                 request.name(),
@@ -97,13 +77,16 @@ public class ProductService extends PageProcessor{
                 request.price(),
                 category,
                 stock,
-                images,
-                java.util.Optional.empty(),
                 now,
                 now
         );
 
-        return productRepository.save(product);
+        product = productRepository.save(product);
+        
+        List<ProductImage> images = productImageService.createProductImages(product.getId(), request.images());
+        product.setImages(images);
+
+        return product;
     }
 
     @Transactional
@@ -142,17 +125,7 @@ public class ProductService extends PageProcessor{
         }
 
         if (request.images() != null && !request.images().isEmpty()) {
-            List<String> imageUrls = storageService.uploadFiles(request.images());
-            List<ProductImage> newImages = new ArrayList<>();
-            for (int i = 0; i < imageUrls.size(); i++) {
-                 newImages.add(new ProductImage(
-                        UUID.randomUUID().toString(),
-                        imageUrls.get(i),
-                        i,
-                        now,
-                        now
-                ));
-            }
+            List<ProductImage> newImages = productImageService.createProductImages(id, request.images());
             product.setImages(newImages);
         }
 
@@ -165,6 +138,6 @@ public class ProductService extends PageProcessor{
         if (!productRepository.findById(id).isPresent()) {
             throw new RuntimeException("Product not found with id: " + id);
         }
-        productRepository.deleteById(id);
+        productRepository.softDeleteById(id);
     }
 }
