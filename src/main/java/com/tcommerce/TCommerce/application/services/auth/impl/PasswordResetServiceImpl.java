@@ -1,13 +1,14 @@
 package com.tcommerce.TCommerce.application.services.auth.impl;
 
 import com.tcommerce.TCommerce.application.services.auth.PasswordResetService;
+import com.tcommerce.TCommerce.application.services.common.EmailBodyService;
 import com.tcommerce.TCommerce.domain.entities.auth.PasswordResetRateLimit;
 import com.tcommerce.TCommerce.domain.entities.auth.PasswordResetToken;
 import com.tcommerce.TCommerce.domain.entities.auth.User;
 import com.tcommerce.TCommerce.domain.repositories.auth.PasswordResetTokenRepository;
 import com.tcommerce.TCommerce.domain.repositories.interfaces.auth.PasswordResetRateLimitRepository;
 import com.tcommerce.TCommerce.domain.repositories.interfaces.auth.UserRepository;
-import com.tcommerce.TCommerce.domain.services.EmailService;
+import com.tcommerce.TCommerce.domain.services.mail.MailEventPublisher;
 import com.tcommerce.TCommerce.interfaces.dto.auth.ChangePasswordRequest;
 import com.tcommerce.TCommerce.interfaces.dto.auth.ResetPasswordRequest;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+import com.tcommerce.TCommerce.domain.events.EmailEvent;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +26,7 @@ public class PasswordResetServiceImpl implements PasswordResetService {
     private final UserRepository userRepository;
     private final PasswordResetRateLimitRepository rateLimitRepository;
     private final PasswordResetTokenRepository tokenRepository;
-    private final EmailService emailService;
+    private final MailEventPublisher emailPublisher;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -43,7 +45,7 @@ public class PasswordResetServiceImpl implements PasswordResetService {
         tokenRepository.save(token);
 
         String resetUrl = "{domain}/reset-password/" + tokenString;
-        emailService.sendEmail(user.getEmail(), "Password Reset Request", "Click here to reset your password: " + resetUrl);
+        emailPublisher.publish(user.getEmail(), "Password Reset Request", "Click here to reset your password: " + resetUrl);
     }
 
     @Override

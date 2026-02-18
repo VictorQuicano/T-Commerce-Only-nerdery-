@@ -89,7 +89,7 @@
 			<optional>true</optional>
 		</dependency>
 
-		<!-- ===== jjwt ===== -->
+		<!-- ====== jjwt ====== -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-api</artifactId>
@@ -112,6 +112,19 @@
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
+
+		<!--- ====== Mail SMTP ====== -->
+		<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+		<!--- ====== Mail SendGrid ====== -->
+		<dependency>
+            <groupId>com.sendgrid</groupId>
+            <artifactId>sendgrid-java</artifactId>
+            <version>4.10.2</version>
+        </dependency>
+		
 	</dependencies>
 
 	<build>
