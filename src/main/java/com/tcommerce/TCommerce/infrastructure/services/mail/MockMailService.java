@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import com.tcommerce.TCommerce.domain.services.mail.MailService;
 import com.tcommerce.TCommerce.domain.events.EmailEvent;
 
-@Component("smtpMailSender")
+@Component("mockMailSender")
 @ConditionalOnProperty(name = "email.mock.enabled", havingValue = "true")
 @Slf4j
 public class MockMailService implements MailService {
@@ -17,7 +17,7 @@ public class MockMailService implements MailService {
     public void send(EmailEvent event) {
         log.info("Sending email to: {}", event.getTo());
         log.info("Subject: {}", event.getSubject());
-        log.info("Body: {}", event.getBody());
+        log.info("Body: {}", event.getDynamicBody());
     }
     
 }

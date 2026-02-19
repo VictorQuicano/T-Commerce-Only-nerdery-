@@ -11,7 +11,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class EmailGenerator {
 
-    private final EmailBodyService emailBodyService;
+    private final ParseBodyService emailBodyService;
 
     public Map<String, Object> generateData(String templateName, Map<String, String> params) {
         Map<String, Object> data = new HashMap<>();

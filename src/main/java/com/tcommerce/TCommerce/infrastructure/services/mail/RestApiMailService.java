@@ -10,7 +10,6 @@ import com.sendgrid.helpers.mail.objects.Personalization;
 import com.tcommerce.TCommerce.domain.events.EmailEvent;
 import com.tcommerce.TCommerce.domain.services.mail.MailService;
 import com.tcommerce.TCommerce.domain.exceptions.MailSendException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -23,8 +22,6 @@ import java.util.Map;
 @ConditionalOnProperty(name = "email.rest.enabled", havingValue = "true")
 @Slf4j
 public class RestApiMailService implements MailService {
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Value("${email.rest.api-key}")
     private String apiKey;
@@ -43,19 +40,13 @@ public class RestApiMailService implements MailService {
         Mail mail = new Mail();
         mail.setFrom(from);
         mail.setTemplateId(templateId);
+        mail.setSubject(event.getSubject());
 
         Personalization personalization = new Personalization();
         personalization.addTo(to);
 
-        // Try to parse the event body as JSON to get dynamic fields
-        try {
-            @SuppressWarnings("unchecked")
-            Map<String, Object> bodyMap = objectMapper.readValue(event.getBody(), Map.class);
-            bodyMap.forEach(personalization::addDynamicTemplateData);
-        } catch (Exception e) {
-            log.warn("[SendGrid] Body is not JSON, using raw body as email_body");
-            personalization.addDynamicTemplateData("email_body", event.getBody());
-        }
+        Map<String, Object> bodyMap = event.getDynamicBody();
+        bodyMap.forEach(personalization::addDynamicTemplateData);
 
         mail.addPersonalization(personalization);
 

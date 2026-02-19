@@ -44,7 +44,7 @@ public class PasswordResetRateLimitEntity {
     @Column(name = "attempts", nullable = false )
     private int attempts;
 
-    @Column(name = "blocked_until", nullable = false)
+    @Column(name = "blocked_until", nullable = true)
     private LocalDateTime blockedUntil;
 
     @CreationTimestamp

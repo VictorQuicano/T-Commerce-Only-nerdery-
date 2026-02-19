@@ -1,5 +1,7 @@
 package com.tcommerce.TCommerce.domain.events;
 
+import java.util.Map;
+
 import org.springframework.context.ApplicationEvent;
 
 import com.google.auto.value.AutoValue.Builder;
@@ -15,7 +17,7 @@ public class EmailEvent extends ApplicationEvent {
 
     private final String to;
     private final String subject;
-    private final String body;
+    private final Map<String, Object> dynamicBody;
     private final DeliveryChannel channel;
 
     public enum DeliveryChannel {
@@ -25,18 +27,16 @@ public class EmailEvent extends ApplicationEvent {
         AUTO
     }
 
-    public EmailEvent(Object source, String to, String subject, String body) {
-        this(source, to, subject, body, DeliveryChannel.AUTO);
+    public EmailEvent(Object source, String to, String subject, Map<String, Object> dynamicBody) {
+        this(source, to, subject, dynamicBody, DeliveryChannel.AUTO);
     }
 
-    public EmailEvent(Object source, String to, String subject, String body, DeliveryChannel channel) {
+    public EmailEvent(Object source, String to, String subject, Map<String, Object> dynamicBody, DeliveryChannel channel) {
         super(source);
         this.to      = to;
         this.subject = subject;
-        this.body    = body;
+        this.dynamicBody    = dynamicBody;
         this.channel = channel;
     }
-
-
 }
 

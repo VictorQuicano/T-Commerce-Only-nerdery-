@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 
 @Service
 @Slf4j
-public class EmailBodyService {
+public class ParseBodyService {
 
     private static final Pattern PLACEHOLDER_PATTERN =
             Pattern.compile("\\{\\{([\\w.\\-]+)\\}\\}");
