@@ -10,12 +10,12 @@ public class CategoryMapper {
     public Category toDomain(CategoryEntity entity) {
         if (entity == null) return null;
 
-        return new Category(
-                entity.getName(),
-                entity.getId(),
-                entity.getCreatedAt(),
-                entity.getUpdatedAt()
-        );
+        return Category.builder()
+            .id(entity.getId())
+            .name(entity.getName())
+            .createdAt(entity.getCreatedAt())
+            .updatedAt(entity.getUpdatedAt())
+            .build();
     }
 
     public CategoryEntity toEntity(Category domain) {

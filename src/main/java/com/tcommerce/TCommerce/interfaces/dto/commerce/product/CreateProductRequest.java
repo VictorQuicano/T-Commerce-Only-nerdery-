@@ -30,10 +30,5 @@ public record CreateProductRequest(
 
         @NotNull(message = "Stock is mandatory")
         @Min(value = 0, message = "Stock quantity must be greater than or equal to 0")
-        BigInteger stockQuantity,
-
-        @NotNull(message = "Images are mandatory")
-        @NotEmpty(message = "Images list cannot be empty")
-        @ValidImageList(maxSizeMB = 3)
-        List<MultipartFile> images
+        BigInteger stockQuantity
 ) {}

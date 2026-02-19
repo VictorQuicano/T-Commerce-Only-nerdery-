@@ -42,8 +42,8 @@ public class DataSeeder implements CommandLineRunner {
         List<Category> categories = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
             Category category = new Category(
-                    faker.commerce().department(),
                     UUID.randomUUID().toString(),
+                    faker.commerce().department(),
                     LocalDateTime.now(),
                     LocalDateTime.now()
             );
@@ -68,6 +68,7 @@ public class DataSeeder implements CommandLineRunner {
                     UUID.randomUUID().toString(),
                     faker.internet().image(),
                     0,
+                    productId,
                     now,
                     now
             ));

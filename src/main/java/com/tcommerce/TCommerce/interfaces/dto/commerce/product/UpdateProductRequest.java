@@ -19,7 +19,5 @@ public record UpdateProductRequest(
         String categoryId,
 
         @Min(value = 0, message = "Stock quantity must be greater than or equal to 0")
-        BigInteger stockQuantity,
-
-        List<MultipartFile> images
+        BigInteger stockQuantity
 ) {}

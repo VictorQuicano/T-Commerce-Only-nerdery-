@@ -7,6 +7,9 @@ import java.util.List;
 
 import com.tcommerce.TCommerce.domain.entities.commerce.ProductImage;
 import com.tcommerce.TCommerce.domain.services.StorageService;
+
+import lombok.RequiredArgsConstructor;
+
 import com.tcommerce.TCommerce.domain.repositories.interfaces.commerce.ProductImageRepository;
 import java.util.ArrayList;
 
@@ -14,16 +17,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class ProductImageService {
 
     private final StorageService storageService;
     private final ProductImageRepository productImageRepository;
-
-    public ProductImageService(StorageService storageService, 
-                               ProductImageRepository productImageRepository) {
-        this.storageService = storageService;
-        this.productImageRepository = productImageRepository;
-    }
 
     public List<ProductImage> createProductImages(String productId, List<MultipartFile> files) {
         if (files == null || files.isEmpty()) {
@@ -37,9 +35,9 @@ public class ProductImageService {
 
             ProductImage productImage = new ProductImage(productId, imageUrl, displayOrder++);
 
-            ProductImage savedImage = productImageRepository.save(productImage);
+            productImage = productImageRepository.save(productImage);
 
-            images.add(savedImage);
+            images.add(productImage);
         }
 
         return images;
