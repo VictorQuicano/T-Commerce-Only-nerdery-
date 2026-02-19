@@ -1,5 +1,6 @@
 package com.tcommerce.TCommerce.interfaces.dto.commerce.product;
 
+import com.tcommerce.TCommerce.interfaces.validation.annotations.ValidImageList;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -33,5 +34,6 @@ public record CreateProductRequest(
 
         @NotNull(message = "Images are mandatory")
         @NotEmpty(message = "Images list cannot be empty")
+        @ValidImageList(maxSizeMB = 3)
         List<MultipartFile> images
 ) {}

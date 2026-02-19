@@ -4,6 +4,7 @@ import com.tcommerce.TCommerce.domain.entities.BaseEntity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,11 +16,37 @@ public class Product implements BaseEntity {
     private Category category;
     private Stock stock;
     private List<ProductImage> images;
-    private Optional<LocalDateTime> deletedAt;
+    private LocalDateTime deletedAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public Product(String id, String name, String description, BigDecimal price, Category category, Stock stock, List<ProductImage> images, Optional<LocalDateTime> deletedAt, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Product(String id, String name, String description, BigDecimal price, Category category, Stock stock, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.category = category;
+        this.stock = stock;
+        this.images = new ArrayList<ProductImage>();
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.deletedAt = null;
+    }
+
+    public Product(String id, String name, String description, BigDecimal price, Category category, Stock stock, List<ProductImage> images, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.category = category;
+        this.stock = stock;
+        this.images = images;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.deletedAt = null;
+    }
+    
+    public Product(String id, String name, String description, BigDecimal price, Category category, Stock stock, List<ProductImage> images, LocalDateTime deletedAt, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -90,11 +117,11 @@ public class Product implements BaseEntity {
     }
 
     public Optional<LocalDateTime> getDeletedAt() {
-        return deletedAt;
+        return Optional.ofNullable(deletedAt);
     }
 
     public void setDeletedAt(Optional<LocalDateTime> deletedAt) {
-        this.deletedAt = deletedAt;
+        this.deletedAt = deletedAt.orElse(null);
     }
 
     @Override
