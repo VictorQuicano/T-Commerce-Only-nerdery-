@@ -1,10 +1,11 @@
 package com.tcommerce.TCommerce.domain.entities.sales;
 
 import com.tcommerce.TCommerce.domain.entities.BaseEntity;
+import com.tcommerce.TCommerce.domain.entities.commerce.Product;
 import com.tcommerce.TCommerce.interfaces.dto.sales.CartItemResponse;
 import lombok.*;
 
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 @Getter
@@ -15,9 +16,8 @@ import java.time.LocalDateTime;
 public class CartItem implements BaseEntity {
     private String id;
     private String cartId;
-    private String itemId; // Referring to Product ID
+    private Product product;
     private Integer quantity;
-    private BigDecimal price;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime deletedAt;
@@ -25,10 +25,11 @@ public class CartItem implements BaseEntity {
     public CartItemResponse toResponse() {
         return new CartItemResponse(
                 this.id,
-                this.itemId,
+                this.product.getId(),
+                this.product.getName(),
                 this.quantity,
-                this.price,
-                this.price.multiply(BigDecimal.valueOf(this.quantity)),
+                this.product.getPrice(),
+                this.product.getPrice().multiply(BigInteger.valueOf(this.quantity)),
                 this.createdAt,
                 this.updatedAt
         );

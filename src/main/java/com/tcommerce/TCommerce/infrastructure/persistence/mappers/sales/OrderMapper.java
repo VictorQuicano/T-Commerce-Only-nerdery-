@@ -104,16 +104,16 @@ public class OrderMapper {
         ProductEntity product = productRepository.findById(domain.getProductId())
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + domain.getProductId()));
 
-        return new OrderItemEntity(
-                domain.getId(),
-                orderEntity,
-                product,
-                domain.getProductName(),
-                domain.getQuantity(),
-                domain.getPrice(),
-                domain.getCreatedAt(),
-                domain.getUpdatedAt()
-        );
+        return OrderItemEntity.builder()
+                .id(domain.getId())
+                .order(orderEntity)
+                .product(product)
+                .productName(domain.getProductName())
+                .quantity(domain.getQuantity())
+                .price(domain.getPrice())
+                .createdAt(domain.getCreatedAt())
+                .updatedAt(domain.getUpdatedAt())
+                .build();
     }
 
     public OrderStatusHistoryEntity toEntity(OrderStatusHistory domain, OrderEntity orderEntity) {
@@ -122,15 +122,15 @@ public class OrderMapper {
         UserEntity changer = userRepository.findById(domain.getChangedBy())
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + domain.getChangedBy()));
 
-        return new OrderStatusHistoryEntity(
-                domain.getId(),
-                orderEntity,
-                domain.getFromStatus(),
-                domain.getToStatus(),
-                domain.getChangedAt(),
-                changer,
-                domain.getReason(),
-                domain.getCreatedAt()
-        );
+        return OrderStatusHistoryEntity.builder()
+                .id(domain.getId())
+                .order(orderEntity)
+                .fromStatus(domain.getFromStatus())
+                .toStatus(domain.getToStatus())
+                .changedAt(domain.getChangedAt())
+                .changedBy(changer)
+                .reason(domain.getReason())
+                .createdAt(domain.getCreatedAt())
+                .build();
     }
 }

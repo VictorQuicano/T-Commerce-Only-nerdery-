@@ -40,7 +40,7 @@ public class CartService {
         Product product = productService.getProductById(productId);
 
         CartItem existingItem = cart.getItems().stream()
-                .filter(item -> item.getItemId().equals(productId))
+                .filter(item -> item.getProduct().getId().equals(productId))
                 .findFirst()
                 .orElse(null);
 
@@ -50,9 +50,8 @@ public class CartService {
         } else {
             CartItem newItem = CartItem.builder()
                     .cartId(cart.getId())
-                    .itemId(productId)
+                    .product(product)
                     .quantity(quantity)
-                    .price(product.getPrice())
                     .updatedAt(LocalDateTime.now())
                     .build();
             cart.getItems().add(newItem);
@@ -64,7 +63,7 @@ public class CartService {
 
     public Cart removeItemFromCart(String userId, String productId) {
         Cart cart = getOrCreateCart(userId);
-        cart.getItems().removeIf(item -> item.getItemId().equals(productId));
+        cart.getItems().removeIf(item -> item.getProduct().getId().equals(productId));
         cart.setUpdatedAt(LocalDateTime.now());
         return cartRepository.save(cart);
     }

@@ -5,7 +5,7 @@ import com.tcommerce.TCommerce.interfaces.dto.sales.OrderItemResponse;
 import com.tcommerce.TCommerce.interfaces.dto.sales.OrderResponse;
 import lombok.*;
 
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,9 +32,9 @@ public class Order implements BaseEntity {
                 .map(item -> item.toResponse())
                 .toList();
 
-        BigDecimal totalAmount = itemResponses.stream()
+        BigInteger totalAmount = itemResponses.stream()
                 .map(OrderItemResponse::subtotal)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .reduce(BigInteger.ZERO, BigInteger::add);
 
         return new OrderResponse(
                 this.id,

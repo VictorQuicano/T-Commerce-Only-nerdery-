@@ -6,7 +6,7 @@ import com.tcommerce.TCommerce.interfaces.dto.commerce.product.ProductListRespon
 
 import lombok.*;
 
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,7 +19,7 @@ public class Product implements BaseEntity {
     private String id;
     private String name;
     private String description;
-    private BigDecimal price;
+    private BigInteger price;
     private Category category;
     private Stock stock;
     private List<ProductImage> images;

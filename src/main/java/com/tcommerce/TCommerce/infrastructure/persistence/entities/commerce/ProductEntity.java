@@ -2,7 +2,7 @@ package com.tcommerce.TCommerce.infrastructure.persistence.entities.commerce;
 
 import com.tcommerce.TCommerce.infrastructure.persistence.entities.BaseEntity;
 import jakarta.persistence.*;
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -15,8 +15,8 @@ public class ProductEntity extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(precision = 10, scale = 2)
-    private BigDecimal price;
+    @Column(nullable = false)
+    private BigInteger price;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
@@ -33,14 +33,14 @@ public class ProductEntity extends BaseEntity {
 
     protected ProductEntity() {}
 
-    public ProductEntity(String id, String name, String description, BigDecimal price, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime deletedAt) {
+    public ProductEntity(String id, String name, String description, BigInteger price, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime deletedAt) {
         super(id, createdAt, updatedAt);
         this.name = name;
         this.description = description;
         this.price = price;
     }
 
-    public ProductEntity(String id, String name, String description, BigDecimal price, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime deletedAt, CategoryEntity category) {
+    public ProductEntity(String id, String name, String description, BigInteger price, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime deletedAt, CategoryEntity category) {
         super(id, createdAt, updatedAt);
         this.name = name;
         this.description = description;
@@ -65,11 +65,11 @@ public class ProductEntity extends BaseEntity {
         this.description = description;
     }
 
-    public BigDecimal getPrice() {
+    public BigInteger getPrice() {
         return price;
     }
 
-    public void setPrice(BigDecimal price) {
+    public void setPrice(BigInteger price) {
         this.price = price;
     }
 

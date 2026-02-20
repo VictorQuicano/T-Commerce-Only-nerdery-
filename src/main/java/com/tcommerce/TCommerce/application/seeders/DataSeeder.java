@@ -10,7 +10,6 @@ import net.datafaker.Faker;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;    
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -77,7 +76,7 @@ public class DataSeeder implements CommandLineRunner {
                     productId,
                     faker.commerce().productName(),
                     faker.commerce().material() + " " + faker.commerce().productName(),
-                    new BigDecimal(faker.commerce().price().replace(",", ".")),
+                    BigInteger.valueOf(faker.number().numberBetween(10, 1000)),
                     category,
                     stock,
                     images,

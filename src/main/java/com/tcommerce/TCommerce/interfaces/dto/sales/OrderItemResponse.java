@@ -1,6 +1,6 @@
 package com.tcommerce.TCommerce.interfaces.dto.sales;
 
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 public record OrderItemResponse(
@@ -8,8 +8,8 @@ public record OrderItemResponse(
     String productId,
     String productName,
     Integer quantity,
-    BigDecimal price,
-    BigDecimal subtotal,
+    BigInteger price,
+    BigInteger subtotal,
     LocalDateTime createdAt,
     LocalDateTime updatedAt
 ) {}

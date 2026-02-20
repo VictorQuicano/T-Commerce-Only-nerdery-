@@ -8,6 +8,7 @@ import com.tcommerce.TCommerce.infrastructure.persistence.entities.sales.CartEnt
 import com.tcommerce.TCommerce.infrastructure.persistence.entities.sales.CartItemEntity;
 import com.tcommerce.TCommerce.infrastructure.persistence.repositories.auth.JpaUserRepository;
 import com.tcommerce.TCommerce.infrastructure.persistence.repositories.commerce.JpaProductRepository;
+import com.tcommerce.TCommerce.infrastructure.persistence.mappers.commerce.ProductMapper;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -19,10 +20,12 @@ public class CartMapper {
 
     private final JpaUserRepository userRepository;
     private final JpaProductRepository productRepository;
+    private final ProductMapper productMapper;
 
-    public CartMapper(JpaUserRepository userRepository, JpaProductRepository productRepository) {
+    public CartMapper(JpaUserRepository userRepository, JpaProductRepository productRepository, ProductMapper productMapper) {
         this.userRepository = userRepository;
         this.productRepository = productRepository;
+        this.productMapper = productMapper;
     }
 
     public Cart toDomain(CartEntity entity) {
@@ -43,9 +46,8 @@ public class CartMapper {
         return CartItem.builder()
                 .id(entity.getId())
                 .cartId(entity.getCart().getId())
-                .itemId(entity.getProduct().getId())
+                .product(productMapper.toDomain(entity.getProduct()))
                 .quantity(entity.getQuantity())
-                .price(entity.getPrice())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
                 .deletedAt(entity.getDeletedAt())
@@ -76,18 +78,17 @@ public class CartMapper {
     public CartItemEntity toEntity(CartItem domain, CartEntity cartEntity) {
         if (domain == null) return null;
 
-        ProductEntity product = productRepository.findById(domain.getItemId())
-                .orElseThrow(() -> new RuntimeException("Product not found with id: " + domain.getItemId()));
+        ProductEntity product = productRepository.findById(domain.getProduct().getId())
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + domain.getProduct().getId()));
 
-        return new CartItemEntity(
-                domain.getId(),
-                cartEntity,
-                product,
-                domain.getQuantity(),
-                domain.getPrice(),
-                domain.getCreatedAt(),
-                domain.getUpdatedAt(),
-                domain.getDeletedAt()
-        );
+        return CartItemEntity.builder()
+                .id(domain.getId())
+                .cart(cartEntity)
+                .product(product)
+                .quantity(domain.getQuantity())
+                .createdAt(domain.getCreatedAt())
+                .updatedAt(domain.getUpdatedAt())
+                .deletedAt(domain.getDeletedAt())
+                .build();
     }
 }

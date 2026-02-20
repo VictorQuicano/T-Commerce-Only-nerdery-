@@ -42,10 +42,10 @@ public class OrderService {
         List<OrderItem> orderItems = cart.getItems().stream()
                 .map(cartItem -> OrderItem.builder()
                         .orderId(orderId)
-                        .productId(cartItem.getItemId())
-                        .productName("Product " + cartItem.getItemId()) // Should fetch actual name if needed
+                        .productId(cartItem.getProduct().getId())
+                        .productName(cartItem.getProduct().getName())
                         .quantity(cartItem.getQuantity())
-                        .price(cartItem.getPrice())
+                        .price(cartItem.getProduct().getPrice())
                         .createdAt(now)
                         .updatedAt(now)
                         .build())

@@ -4,7 +4,7 @@ import com.tcommerce.TCommerce.domain.entities.BaseEntity;
 import com.tcommerce.TCommerce.interfaces.dto.sales.OrderItemResponse;
 import lombok.*;
 
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 @Getter
@@ -18,7 +18,7 @@ public class OrderItem implements BaseEntity {
     private String productId;
     private String productName;
     private Integer quantity;
-    private BigDecimal price;
+    private BigInteger price;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime deletedAt;
@@ -30,7 +30,7 @@ public class OrderItem implements BaseEntity {
                 this.productName,
                 this.quantity,
                 this.price,
-                this.price.multiply(BigDecimal.valueOf(this.quantity)),
+                this.price.multiply(BigInteger.valueOf(this.quantity)),
                 this.createdAt,
                 this.updatedAt
         );

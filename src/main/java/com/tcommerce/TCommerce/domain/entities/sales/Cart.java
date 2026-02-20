@@ -5,7 +5,7 @@ import com.tcommerce.TCommerce.interfaces.dto.sales.CartItemResponse;
 import com.tcommerce.TCommerce.interfaces.dto.sales.CartResponse;
 import lombok.*;
 
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,9 +28,9 @@ public class Cart implements BaseEntity {
                 .map(item -> item.toResponse())
                 .toList();
 
-        BigDecimal totalPrice = itemResponses.stream()
+        BigInteger totalPrice = itemResponses.stream()
                 .map(CartItemResponse::subtotal)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .reduce(BigInteger.ZERO, BigInteger::add);
 
         return new CartResponse(
                 this.id,

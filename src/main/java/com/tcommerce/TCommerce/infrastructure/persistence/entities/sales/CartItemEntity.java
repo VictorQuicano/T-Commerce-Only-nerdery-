@@ -3,7 +3,6 @@ package com.tcommerce.TCommerce.infrastructure.persistence.entities.sales;
 import com.tcommerce.TCommerce.infrastructure.persistence.entities.commerce.ProductEntity;
 import jakarta.persistence.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -33,9 +32,6 @@ public class CartItemEntity {
 
     @Column(nullable = false)
     private Integer quantity;
-
-    @Column(precision = 10, scale = 2)
-    private BigDecimal price;
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;

@@ -3,7 +3,7 @@ package com.tcommerce.TCommerce.infrastructure.persistence.entities.sales;
 import com.tcommerce.TCommerce.infrastructure.persistence.entities.commerce.ProductEntity;
 import jakarta.persistence.*;
 
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -39,8 +39,8 @@ public class OrderItemEntity {
     @Column(nullable = false)
     private Integer quantity;
 
-    @Column(precision = 10, scale = 2)
-    private BigDecimal price;
+    @Column(nullable = false)
+    private BigInteger price;
 
 
     @CreationTimestamp
