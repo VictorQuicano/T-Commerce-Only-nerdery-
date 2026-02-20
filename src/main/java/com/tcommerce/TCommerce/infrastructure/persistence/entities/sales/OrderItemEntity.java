@@ -1,39 +1,47 @@
 package com.tcommerce.TCommerce.infrastructure.persistence.entities.sales;
 
-import com.tcommerce.TCommerce.infrastructure.persistence.entities.auth.UserEntity;
+import com.tcommerce.TCommerce.infrastructure.persistence.entities.commerce.ProductEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-
 import lombok.*;
 
 @Entity
-@Table(name = "carts")
+@Table(name = "order_items")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CartEntity{
+public class OrderItemEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false, unique = true)
-    private UserEntity user;
 
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CartItemEntity> items;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id", nullable = false)
+    private OrderEntity order;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    private ProductEntity product;
+
+    @Column(name = "product_name")
+    private String productName;
+
+    @Column(nullable = false)
+    private Integer quantity;
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal price;
+
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
@@ -42,5 +50,4 @@ public class CartEntity{
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
-
 }
