@@ -4,6 +4,9 @@ import com.tcommerce.TCommerce.application.controllers.ApiPaths;
 import com.tcommerce.TCommerce.application.services.sales.OrderService;
 import com.tcommerce.TCommerce.infrastructure.security.services.UserDetailsImpl;
 import com.tcommerce.TCommerce.interfaces.dto.sales.OrderResponse;
+import com.tcommerce.TCommerce.interfaces.dto.sales.OrderWithHistory;
+import com.tcommerce.TCommerce.domain.entities.sales.Order;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -37,7 +40,6 @@ public class OrderController {
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable String orderId) {
 
-        // TODO: Implement proper authorization
         OrderResponse order = orderService.getOrderById(orderId).toResponse();
         
         if (!order.userId().equals(userDetails.getId())) {
@@ -45,5 +47,13 @@ public class OrderController {
         }
         
         return ResponseEntity.ok(order);
+    }
+    @GetMapping("/{orderId}/history")
+    public ResponseEntity<OrderWithHistory> getOrderHistory(
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
+        @PathVariable String orderId) {
+
+        Order order = orderService.getOrderById(orderId);
+        return ResponseEntity.ok(order.toResponseWithHistory());
     }
 }

@@ -72,18 +72,17 @@ public class DataSeeder implements CommandLineRunner {
                     now
             ));
 
-            Product product = new Product(
-                    productId,
-                    faker.commerce().productName(),
-                    faker.commerce().material() + " " + faker.commerce().productName(),
-                    BigInteger.valueOf(faker.number().numberBetween(10, 1000)),
-                    category,
-                    stock,
-                    images,
-                    null,
-                    now,
-                    now
-            );
+            Product product = Product.builder()
+                    .id(productId)
+                    .name(faker.commerce().productName())
+                    .description(faker.commerce().material() + " " + faker.commerce().productName())
+                    .price(BigInteger.valueOf(faker.number().numberBetween(10, 1000)))
+                    .category(category)
+                    .stock(stock)
+                    .images(images)
+                    .createdAt(now)
+                    .updatedAt(now)
+                    .build(); 
 
             productRepository.save(product);
         }

@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import com.tcommerce.TCommerce.domain.services.mail.MailService;
 import com.tcommerce.TCommerce.domain.events.EmailEvent;
+import java.util.Map;
 
 @Component("mockMailSender")
 @ConditionalOnProperty(name = "email.mock.enabled", havingValue = "true")
@@ -15,9 +16,11 @@ public class MockMailService implements MailService {
 
     @Override
     public void send(EmailEvent event) {
+        Map<String, Object> dynamicBody = event.getDynamicBody();
+        String body = (String) dynamicBody.get("email_body");
         log.info("Sending email to: {}", event.getTo());
         log.info("Subject: {}", event.getSubject());
-        log.info("Body: {}", event.getDynamicBody());
+        log.info("Body: {}", body);
     }
     
 }

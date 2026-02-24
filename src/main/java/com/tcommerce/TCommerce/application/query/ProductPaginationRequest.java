@@ -15,6 +15,8 @@ public record ProductPaginationRequest(
     String before,
     
     String sortBy,
-    String sortOrder
+    String sortOrder,
+    Boolean isActive,
+    Boolean isDeleted
 ) implements Pageable {
 }

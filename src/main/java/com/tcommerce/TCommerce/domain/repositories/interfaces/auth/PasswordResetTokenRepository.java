@@ -1,4 +1,4 @@
-package com.tcommerce.TCommerce.domain.repositories.auth;
+package com.tcommerce.TCommerce.domain.repositories.interfaces.auth;
 
 import com.tcommerce.TCommerce.domain.entities.auth.PasswordResetToken;
 import com.tcommerce.TCommerce.domain.entities.auth.User;

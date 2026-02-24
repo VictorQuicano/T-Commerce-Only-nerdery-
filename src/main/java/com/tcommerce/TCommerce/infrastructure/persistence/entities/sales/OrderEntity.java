@@ -43,6 +43,9 @@ public class OrderEntity{
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderStatusHistoryEntity> statusHistory;
 
+    @Column(name = "payment_intent_id")
+    private String paymentIntentId;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;

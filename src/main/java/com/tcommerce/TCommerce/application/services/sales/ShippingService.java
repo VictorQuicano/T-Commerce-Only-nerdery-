@@ -1,0 +1,48 @@
+package com.tcommerce.TCommerce.application.services.sales;
+
+import com.tcommerce.TCommerce.domain.entities.commerce.Product;
+import com.tcommerce.TCommerce.domain.entities.sales.Order;
+import com.tcommerce.TCommerce.domain.entities.sales.OrderItem;
+import com.tcommerce.TCommerce.application.services.commerce.ProductService;
+import com.tcommerce.TCommerce.application.services.commerce.StockNotificationService;
+import com.tcommerce.TCommerce.domain.repositories.interfaces.auth.UserRepository;
+import com.tcommerce.TCommerce.domain.entities.auth.User;
+
+import org.springframework.stereotype.Service;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import java.math.BigInteger;
+
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class ShippingService {
+    private final ProductService productService;
+    private final UserRepository userRepository;
+    private final StockNotificationService stockNotificationService;
+
+
+    public void startShipping(Order order) {
+        String userId = order.getUserId();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        order.getItems().stream().forEach(item -> {
+            checkStock(item, user);
+        });
+        
+    }
+
+    private void checkStock(OrderItem order, User user) {
+        Product product = productService.getProductById(order.getProductId());
+        if(product == null ){
+            return;
+        }
+        if (!productService.hasEnoughStock(product, BigInteger.valueOf(order.getQuantity()))){
+            stockNotificationService.notifyUserNotEnoughStock(product, user);
+        }
+        productService.reduceStock(product, BigInteger.valueOf(order.getQuantity()));
+    }
+}

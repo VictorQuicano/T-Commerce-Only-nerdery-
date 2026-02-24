@@ -4,8 +4,8 @@ import com.tcommerce.TCommerce.application.services.auth.PasswordResetService;
 import com.tcommerce.TCommerce.domain.entities.auth.PasswordResetRateLimit;
 import com.tcommerce.TCommerce.domain.entities.auth.PasswordResetToken;
 import com.tcommerce.TCommerce.domain.entities.auth.User;
-import com.tcommerce.TCommerce.domain.repositories.auth.PasswordResetTokenRepository;
 import com.tcommerce.TCommerce.domain.repositories.interfaces.auth.PasswordResetRateLimitRepository;
+import com.tcommerce.TCommerce.domain.repositories.interfaces.auth.PasswordResetTokenRepository;
 import com.tcommerce.TCommerce.domain.repositories.interfaces.auth.UserRepository;
 import com.tcommerce.TCommerce.domain.services.mail.MailEventPublisher;
 import com.tcommerce.TCommerce.interfaces.dto.auth.PasswordResetResponse;
@@ -32,8 +32,8 @@ public class PasswordResetServiceImpl implements PasswordResetService {
     private final MailEventPublisher emailPublisher;
     private final PasswordEncoder passwordEncoder;
 
-    private static final int MAX_ATTEMPTS = 20;
-    private static final int WAIT_MINUTES = 0;
+    private static final int MAX_ATTEMPTS = 5;
+    private static final int WAIT_MINUTES = 5;
     private static final int BLOCK_MINUTES = 20;
 
     @Value("${server.domain}")
@@ -127,6 +127,10 @@ public class PasswordResetServiceImpl implements PasswordResetService {
         User user = token.getUser();
         user.setPassword(passwordEncoder.encode(request.password()));
         userRepository.save(user);
+
+        Map<String, String> dynamicBody = new HashMap<>(Map.of("first_name", user.getFirstName()));
+        dynamicBody.put("last_name", user.getLastName());
+        emailPublisher.buildAndPublish(user.getEmail(), "Password Successfully Changed","password-changed", dynamicBody);
 
         tokenRepository.delete(token);
     }

@@ -1,14 +1,29 @@
 package com.tcommerce.TCommerce.infrastructure.persistence.entities.commerce;
 
-import com.tcommerce.TCommerce.infrastructure.persistence.entities.BaseEntity;
+
 import jakarta.persistence.*;
+import lombok.*;
+
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 @Entity
 @Table(name = "products")
-public class ProductEntity extends BaseEntity {
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Getter
+@Setter
+public class ProductEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
+
+
     @Column(nullable = false, length = 255)
     private String name;
 
@@ -17,6 +32,9 @@ public class ProductEntity extends BaseEntity {
 
     @Column(nullable = false)
     private BigInteger price;
+
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
@@ -30,78 +48,13 @@ public class ProductEntity extends BaseEntity {
 
     @Column(name="deleted_at")
     private LocalDateTime deletedAt;
+    
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
 
-    protected ProductEntity() {}
-
-    public ProductEntity(String id, String name, String description, BigInteger price, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime deletedAt) {
-        super(id, createdAt, updatedAt);
-        this.name = name;
-        this.description = description;
-        this.price = price;
-    }
-
-    public ProductEntity(String id, String name, String description, BigInteger price, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime deletedAt, CategoryEntity category) {
-        super(id, createdAt, updatedAt);
-        this.name = name;
-        this.description = description;
-        this.price = price;
-        this.category = category;
-        this.deletedAt = deletedAt;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public BigInteger getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigInteger price) {
-        this.price = price;
-    }
-
-    public LocalDateTime getDeletedAt() {
-        return deletedAt;
-    }
-
-    public void setDeletedAt(LocalDateTime deletedAt) {
-        this.deletedAt = deletedAt;
-    }
-
-    public CategoryEntity getCategory() {
-        return category;
-    }
-
-    public void setCategory(CategoryEntity category) {
-        this.category = category;
-    }
-
-    public List<ProductImageEntity> getImages() {
-        return images;
-    }
-
-    public void setImages(List<ProductImageEntity> images) {
-        this.images = images;
-    }
-    public StockEntity getStock() {
-        return stock;
-    }
-
-    public void setStock(StockEntity stock) {
-        this.stock = stock;
-    }
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
 }

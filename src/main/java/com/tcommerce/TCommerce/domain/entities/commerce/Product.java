@@ -20,6 +20,7 @@ public class Product implements BaseEntity {
     private String name;
     private String description;
     private BigInteger price;
+    private boolean isActive;
     private Category category;
     private Stock stock;
     private List<ProductImage> images;

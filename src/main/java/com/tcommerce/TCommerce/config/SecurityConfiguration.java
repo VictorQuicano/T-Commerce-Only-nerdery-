@@ -58,6 +58,7 @@ public class SecurityConfiguration {
                                         //"/swagger-ui.html"
 
                                 ).permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/v1/payments/webhook").permitAll()
                                 //.requestMatchers("/api/v1/resource").hasAnyRole("ADMIN","USER") replaced with annotation in AuthorizationController
                                 //.requestMatchers(HttpMethod.POST,"/api/v1/resource").hasRole("ADMIN")
                                 .anyRequest().authenticated())

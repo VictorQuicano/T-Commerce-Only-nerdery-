@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -35,7 +36,8 @@ public class CartService {
         return cartRepository.save(cart);
     }
 
-    public Cart addItemToCart(String userId, String productId, Integer quantity) {
+    public Cart addItemToCart(String userId, String productId, int quantity) {
+
         Cart cart = getOrCreateCart(userId);
         Product product = productService.getProductById(productId);
 
@@ -44,8 +46,17 @@ public class CartService {
                 .findFirst()
                 .orElse(null);
 
+        int currentQuantity = existingItem != null ? existingItem.getQuantity() : 0;
+        int newQuantity = currentQuantity + quantity;
+
+        BigInteger availableStock = product.getStock().getQuantity();
+
+        if (availableStock.compareTo(BigInteger.valueOf(newQuantity)) < 0) {
+            throw new IllegalStateException("Not enough stock");
+        }
+
         if (existingItem != null) {
-            existingItem.setQuantity(existingItem.getQuantity() + quantity);
+            existingItem.setQuantity(newQuantity);
             existingItem.setUpdatedAt(LocalDateTime.now());
         } else {
             CartItem newItem = CartItem.builder()
@@ -69,6 +80,9 @@ public class CartService {
     }
 
     public void clearCart(String userId) {
-        cartRepository.deleteByUserId(userId);
+        Cart cart = getOrCreateCart(userId);
+        cart.getItems().clear();
+        cart.setUpdatedAt(LocalDateTime.now());
+        cartRepository.save(cart);
     }
 }

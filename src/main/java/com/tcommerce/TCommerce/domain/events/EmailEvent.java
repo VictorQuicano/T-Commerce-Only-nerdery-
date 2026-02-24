@@ -33,10 +33,10 @@ public class EmailEvent extends ApplicationEvent {
 
     public EmailEvent(Object source, String to, String subject, Map<String, Object> dynamicBody, DeliveryChannel channel) {
         super(source);
-        this.to      = to;
-        this.subject = subject;
+        this.to             = to;
+        this.subject        = subject;
         this.dynamicBody    = dynamicBody;
-        this.channel = channel;
+        this.channel        = channel;
     }
 }
 
