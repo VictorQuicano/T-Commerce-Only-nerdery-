@@ -5,6 +5,9 @@ import com.tcommerce.TCommerce.domain.exceptions.AlreadyExistsException;
 import com.tcommerce.TCommerce.domain.repositories.interfaces.commerce.CategoryRepository;
 import com.tcommerce.TCommerce.interfaces.dto.commerce.category.CreateCategoryRequest;
 import com.tcommerce.TCommerce.interfaces.dto.commerce.category.UpdateCategoryRequest;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,13 +17,10 @@ import java.util.UUID;
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
-
-    public CategoryService(CategoryRepository categoryRepository) {
-        this.categoryRepository = categoryRepository;
-    }
 
     public List<Category> getAllCategories() {
         return categoryRepository.findAll();
@@ -40,12 +40,12 @@ public class CategoryService {
         if (categoryRepository.existsByName(request.name())) {
             throw new AlreadyExistsException("Category already exists with name: " + request.name(), "CATEGORY_ALREADY_EXISTS");
         }
-        Category category = new Category(
-                request.name(),
-                UUID.randomUUID().toString(),
-                LocalDateTime.now(),
-                LocalDateTime.now()
-        );
+        Category category = Category.builder()
+                .id(UUID.randomUUID().toString())
+                .name(request.name())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
         return categoryRepository.save(category);
     }
 

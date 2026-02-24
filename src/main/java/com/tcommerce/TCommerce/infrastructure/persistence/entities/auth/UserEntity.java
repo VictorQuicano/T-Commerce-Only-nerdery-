@@ -10,6 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@ToString
 @Table(name = "users",
     uniqueConstraints = @UniqueConstraint(name = "uq_user_email", columnNames = "email"))
 public class UserEntity extends BaseEntity {

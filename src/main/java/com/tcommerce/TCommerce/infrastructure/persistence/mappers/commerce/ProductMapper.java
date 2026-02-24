@@ -47,7 +47,7 @@ public class ProductMapper {
                 domain.getPrice(),
                 domain.getCreatedAt(),
                 domain.getUpdatedAt(),
-                domain.getDeletedAt().orElse(null)
+                domain.getDeletedAt()
         );
 
         if (domain.getCategory() != null) {
