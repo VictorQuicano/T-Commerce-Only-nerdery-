@@ -169,4 +169,12 @@ public class ProductService {
         }
         productRepository.softDeleteById(id);
     }
+
+    @Transactional
+    public Product disableProduct(String id) {
+        Product product = getProductById(id);
+        product.setActive(false);
+        product.setUpdatedAt(LocalDateTime.now());
+        return productRepository.save(product);
+    }
 }

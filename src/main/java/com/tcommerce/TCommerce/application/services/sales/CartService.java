@@ -79,10 +79,10 @@ public class CartService {
         return cartRepository.save(cart);
     }
 
-    public void clearCart(String userId) {
+    public Cart clearCart(String userId) {
         Cart cart = getOrCreateCart(userId);
         cart.getItems().clear();
         cart.setUpdatedAt(LocalDateTime.now());
-        cartRepository.save(cart);
+        return cartRepository.save(cart);
     }
 }
