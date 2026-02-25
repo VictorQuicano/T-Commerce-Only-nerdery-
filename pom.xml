@@ -120,6 +120,13 @@
             <version>4.10.2</version>
         </dependency>
 
+		<!--- ====== Mail Resend ====== -->
+		<dependency>
+            <groupId>com.resend</groupId>
+            <artifactId>resend-java</artifactId>
+            <version>LATEST</version>
+        </dependency>
+
 		<!--- ====== Stripe Payments ====== -->
 		<dependency>
 			<groupId>com.stripe</groupId>

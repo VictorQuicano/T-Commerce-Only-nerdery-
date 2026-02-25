@@ -18,18 +18,18 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.Map;
 
-@Component("restApiMailSender")
-@ConditionalOnProperty(name = "email.rest.enabled", havingValue = "true")
+@Component("restApiSendgridMailSender")
+@ConditionalOnProperty(name = "email.rest.sendgrid.enabled", havingValue = "true")
 @Slf4j
-public class RestApiMailService implements MailService {
+public class RestApiSendgridMailService implements MailService {
 
-    @Value("${email.rest.api-key}")
+    @Value("${email.rest.sendgrid.api-key}")
     private String apiKey;
 
-    @Value("${email.rest.from}")
+    @Value("${email.rest.sendgrid.from}")
     private String fromAddress;
 
-    @Value("${email.rest.template-id:d-584264a687334458a729dd43c4d1a6be}")
+    @Value("${email.rest.sendgrid.template-id:d-584264a687334458a729dd43c4d1a6be}")
     private String templateId;
 
     @Override

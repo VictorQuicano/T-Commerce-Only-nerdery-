@@ -22,7 +22,8 @@ public class EmailEvent extends ApplicationEvent {
 
     public enum DeliveryChannel {
         SMTP,
-        REST_API,
+        REST_API_SENDGRID,
+        REST_API_RESEND,
         MOCK,
         AUTO
     }
