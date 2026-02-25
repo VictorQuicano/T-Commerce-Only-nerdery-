@@ -47,6 +47,7 @@ public class SecurityConfiguration {
                                         "/api/v1/products/**",
                                         "/api/v1/categories/**",
                                         "/graphql",
+                                        "/graphql/**",
                                         "/graphiql",
                                         "/graphiql/**",
                                         "/favicon.ico"
