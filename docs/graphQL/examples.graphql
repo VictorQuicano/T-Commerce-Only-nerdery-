@@ -1,0 +1,153 @@
+# ===== Expresión de Queries de Ejemplo =====
+
+# Obtener mis órdenes con paginación (Estilo Relay)
+query GetMyOrders($first: Int, $after: String) {
+  myOrders(first: $first, after: $after) {
+    edges {
+      cursor
+      node {
+        id
+        status
+        total
+        createdAt
+        items {
+          product {
+            id
+            name
+            price
+          }
+          quantity
+          price
+        }
+      }
+    }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+  }
+}
+
+# Obtener órdenes para el Manager con filtro opcional de estado
+query GetManagerOrders($first: Int, $after: String, $status: OrderStatus) {
+  managerOrders(first: $first, after: $after, status: $status) {
+    edges {
+      cursor
+      node {
+        id
+        userId
+        status
+        total
+        createdAt
+        items {
+          product {
+            name
+          }
+          quantity
+        }
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
+
+# ===== Expresión de Mutations de Ejemplo =====
+
+# --- Gestión del Carrito ---
+
+# Agregar un producto al carrito
+mutation AddToCart($productId: ID!, $quantity: Int!) {
+  addToCart(productId: $productId, quantity: $quantity) {
+    id
+    total
+    items {
+      product {
+        id
+        name
+        price
+      }
+      quantity
+    }
+  }
+}
+
+# Remover un producto del carrito
+mutation RemoveFromCart($productId: ID!) {
+  removeFromCart(productId: $productId) {
+    id
+    total
+    items {
+      product {
+        name
+      }
+      quantity
+    }
+  }
+}
+
+# Vaciar el carrito
+mutation ClearCart {
+  clearCart {
+    id
+    items {
+      product {
+        name
+      }
+    }
+    total
+  }
+}
+
+# --- Gestión de Órdenes ---
+
+# Crear una orden a partir del contenido del carrito actual
+mutation CreateOrder {
+  createOrderFromCart {
+    id
+    status
+    total
+    items {
+      product {
+        name
+      }
+      quantity
+    }
+  }
+}
+
+# Actualizar el estado de entrega de una orden (Solo Manager)
+mutation UpdateDeliveryStatus($orderId: ID!, $status: OrderStatus!) {
+  updateDeliveryStatus(orderId: $orderId, status: $status) {
+    id
+    status
+    updatedAt
+  }
+}
+
+# --- Gestión de Productos (Solo Manager) ---
+
+# Deshabilitar un producto
+mutation DisableProduct($productId: ID!) {
+  disableProduct(productId: $productId) {
+    id
+    name
+    disabled
+  }
+}
+
+# Eliminar un producto
+mutation DeleteProduct($productId: ID!) {
+  deleteProduct(productId: $productId)
+}
+
+# --- Otras Acciones ---
+
+# Dar/Quitar "like" a un producto
+mutation ToggleLike($productId: ID!) {
+  toggleLike(productId: $productId)
+}
