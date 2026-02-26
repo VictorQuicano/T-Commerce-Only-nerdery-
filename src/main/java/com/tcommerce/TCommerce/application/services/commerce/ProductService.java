@@ -70,23 +70,20 @@ public class ProductService extends PageProcessor{
         );
         Category category = categoryRepository.findById(request.categoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found with id: " + request.categoryId()));
-        Product product = new Product(
-                productId,
-                request.name(),
-                request.description(),
-                request.price(),
-                category,
-                stock,
-                now,
-                now
-        );
-
-        product = productRepository.save(product);
         
-        List<ProductImage> images = productImageService.createProductImages(product.getId(), request.images());
-        product.setImages(images);
+        Product product = Product.builder()
+                //.id(productId)
+                .name(request.name())
+                .description(request.description())
+                .price(request.price())
+                .category(category)
+                .stock(stock)
+                .images(new ArrayList<>())
+                .createdAt(now)
+                .updatedAt(now)
+                .build();
 
-        return product;
+        return productRepository.save(product);
     }
 
     @Transactional
