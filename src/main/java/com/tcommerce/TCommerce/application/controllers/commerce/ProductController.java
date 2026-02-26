@@ -27,7 +27,7 @@ public class ProductController extends PageProcessor {
     public ResponseEntity<Window<ProductListResponse>> getAllProducts(
             ProductPaginationRequest request) {
             
-        ProductFilter filter = new ProductFilter(request.name(), request.categoryId());
+        ProductFilter filter = new ProductFilter(request.name(), request.categoryId(), true, false);
         
         PaginationCriteria criteria = processRequest(request);
 

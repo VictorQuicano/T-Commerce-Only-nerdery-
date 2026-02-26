@@ -1,0 +1,15 @@
+target/
+!.mvn/wrapper/maven-wrapper.jar
+.vscode/
+.idea/
+.git/
+.gitignore
+*.log
+Dockerfile
+.dockerignore
+docker-compose.yml
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties

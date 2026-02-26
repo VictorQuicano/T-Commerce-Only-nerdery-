@@ -36,6 +36,7 @@ public class OrderMapper {
                 .status(entity.getStatus())
                 .items(entity.getItems().stream().map(this::toDomain).collect(Collectors.toCollection(ArrayList::new)))
                 .statusHistory(entity.getStatusHistory().stream().map(this::toDomain).collect(Collectors.toCollection(ArrayList::new)))
+                .paymentIntentId(entity.getPaymentIntentId())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
                 .build();
@@ -65,7 +66,7 @@ public class OrderMapper {
                 .fromStatus(entity.getFromStatus())
                 .toStatus(entity.getToStatus())
                 .changedAt(entity.getChangedAt())
-                .changedBy(entity.getChangedBy().getId())
+                .changedBy(entity.getChangedBy() != null ? entity.getChangedBy().getId() : null)
                 .reason(entity.getReason())
                 .createdAt(entity.getCreatedAt())
                 .build();
@@ -81,6 +82,7 @@ public class OrderMapper {
                 .id(domain.getId())
                 .user(user)
                 .status(domain.getStatus())
+                .paymentIntentId(domain.getPaymentIntentId())
                 .createdAt(domain.getCreatedAt())
                 .updatedAt(domain.getUpdatedAt())
                 .build();
@@ -119,8 +121,11 @@ public class OrderMapper {
     public OrderStatusHistoryEntity toEntity(OrderStatusHistory domain, OrderEntity orderEntity) {
         if (domain == null) return null;
 
-        UserEntity changer = userRepository.findById(domain.getChangedBy())
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + domain.getChangedBy()));
+        UserEntity changer = null;
+        if (domain.getChangedBy() != null) {
+            changer = userRepository.findById(domain.getChangedBy())
+                    .orElseThrow(() -> new RuntimeException("User not found with id: " + domain.getChangedBy()));
+        }
 
         return OrderStatusHistoryEntity.builder()
                 .id(domain.getId())

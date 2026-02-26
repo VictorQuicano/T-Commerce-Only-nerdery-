@@ -19,6 +19,7 @@ import lombok.*;
 public class OrderStatusHistoryEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -37,7 +38,7 @@ public class OrderStatusHistoryEntity {
     private LocalDateTime changedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "changed_by", nullable = false)
+    @JoinColumn(name = "changed_by", nullable = true)
     private UserEntity changedBy;
 
     private String reason;

@@ -11,6 +11,8 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.context.request.WebRequest;
 
+import com.stripe.exception.StripeException;
+
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -98,6 +100,22 @@ public class GlobalExceptionHandler {
 
         problemDetail.setTitle("Unauthorized");
         problemDetail.setType(URI.create("unauthorized"));
+        problemDetail.setProperty("timestamp", LocalDateTime.now());
+        problemDetail.setProperty("path", request.getDescription(false).replace("uri=", ""));
+
+        return problemDetail;
+    }
+
+    @ExceptionHandler(StripeException.class)
+    public ProblemDetail handleStripeException(StripeException ex, WebRequest request) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_GATEWAY,
+                "Payment processing error: " + ex.getMessage()
+        );
+
+        problemDetail.setTitle("Payment Error");
+        problemDetail.setType(URI.create("payment-error"));
+        problemDetail.setProperty("stripeCode", ex.getCode());
         problemDetail.setProperty("timestamp", LocalDateTime.now());
         problemDetail.setProperty("path", request.getDescription(false).replace("uri=", ""));
 

@@ -22,7 +22,8 @@ public class EmailEvent extends ApplicationEvent {
 
     public enum DeliveryChannel {
         SMTP,
-        REST_API,
+        REST_API_SENDGRID,
+        REST_API_RESEND,
         MOCK,
         AUTO
     }
@@ -33,10 +34,10 @@ public class EmailEvent extends ApplicationEvent {
 
     public EmailEvent(Object source, String to, String subject, Map<String, Object> dynamicBody, DeliveryChannel channel) {
         super(source);
-        this.to      = to;
-        this.subject = subject;
+        this.to             = to;
+        this.subject        = subject;
         this.dynamicBody    = dynamicBody;
-        this.channel = channel;
+        this.channel        = channel;
     }
 }
 

@@ -1,8 +1,12 @@
 package com.tcommerce.TCommerce.application.services.sales;
 
+import com.tcommerce.TCommerce.application.query.OrderFilter;
 import com.tcommerce.TCommerce.domain.entities.sales.*;
 import com.tcommerce.TCommerce.domain.repositories.interfaces.sales.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.ScrollPosition;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Window;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +24,10 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final CartService cartService;
 
+    public Window<Order> getAllOrders(OrderFilter filter, ScrollPosition position, int limit, Sort sort) {
+        return orderRepository.findAll(position, limit, filter, sort);
+    }
+
     public Order createOrderFromCart(String userId) {
         Cart cart = cartService.getOrCreateCart(userId);
         if (cart.getItems().isEmpty()) {
@@ -27,10 +35,8 @@ public class OrderService {
         }
 
         LocalDateTime now = LocalDateTime.now();
-        String orderId = UUID.randomUUID().toString();
 
         Order order = Order.builder()
-                .id(orderId)
                 .userId(userId)
                 .status(OrderStatus.PENDING)
                 .createdAt(now)
@@ -41,7 +47,6 @@ public class OrderService {
 
         List<OrderItem> orderItems = cart.getItems().stream()
                 .map(cartItem -> OrderItem.builder()
-                        .orderId(orderId)
                         .productId(cartItem.getProduct().getId())
                         .productName(cartItem.getProduct().getName())
                         .quantity(cartItem.getQuantity())
@@ -54,7 +59,6 @@ public class OrderService {
         order.setItems(orderItems);
 
         OrderStatusHistory initialHistory = OrderStatusHistory.builder()
-                .orderId(orderId)
                 .fromStatus(null)
                 .toStatus(OrderStatus.PENDING)
                 .changedAt(now)
@@ -80,14 +84,14 @@ public class OrderService {
 
     public Order updateOrderStatus(String orderId, OrderStatus nextStatus, String userId, String reason) {
         Order order = getOrderById(orderId);
-        OrderStatus currentStatus = order.getStatus();
+        OrderStatus currentStatus = order.getStatus();        
 
         OrderStatusHistory history = OrderStatusHistory.builder()
                 .orderId(orderId)
                 .fromStatus(currentStatus)
                 .toStatus(nextStatus)
                 .changedAt(LocalDateTime.now())
-                .changedBy(userId)
+                .changedBy("SYSTEM".equals(userId) ? null : userId)
                 .reason(reason)
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -98,4 +102,48 @@ public class OrderService {
 
         return orderRepository.save(order);
     }
+
+    public Order cancelOrder(Order order, String userId, String reason) {
+        OrderStatus currentStatus = order.getStatus();
+
+        OrderStatusHistory history = OrderStatusHistory.builder()
+                .orderId(order.getId())
+                .fromStatus(currentStatus)
+                .toStatus(OrderStatus.CANCELLED)
+                .changedAt(LocalDateTime.now())
+                .changedBy(userId)
+                .reason(reason)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        order.setStatus(OrderStatus.CANCELLED);
+        order.setUpdatedAt(LocalDateTime.now());
+        order.getStatusHistory().add(history);
+
+        return orderRepository.save(order);
+    }
+
+    public Order initiatePayment(String orderId, String paymentIntentId, String userId) {
+        Order order = getOrderById(orderId);
+        OrderStatus currentStatus = order.getStatus();
+
+        OrderStatusHistory history = OrderStatusHistory.builder()
+                .id(UUID.randomUUID().toString())
+                .orderId(orderId)
+                .fromStatus(currentStatus)
+                .toStatus(OrderStatus.AWAITING_PAYMENT)
+                .changedAt(LocalDateTime.now())
+                .changedBy(userId)
+                .reason("Payment initiated")
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        order.setPaymentIntentId(paymentIntentId);
+        order.setStatus(OrderStatus.AWAITING_PAYMENT);
+        order.setUpdatedAt(LocalDateTime.now());
+        order.getStatusHistory().add(history);
+
+        return orderRepository.save(order);
+    }
 }
+

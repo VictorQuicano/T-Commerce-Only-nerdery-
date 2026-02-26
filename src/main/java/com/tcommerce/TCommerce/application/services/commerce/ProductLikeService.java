@@ -21,15 +21,16 @@ public class ProductLikeService {
 
     @Transactional
     public ProductLikeResponse likeProduct(String productId, String userId) {
-        ProductEntity product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
-
-        UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-
+        
         boolean alreadyLiked = likeRepository.existsByProductIdAndUserId(productId, userId);
-
+        
         if (!alreadyLiked) {
+            ProductEntity product = productRepository.findById(productId)
+                    .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
+    
+            UserEntity user = userRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+                    
             ProductLikeEntity newLike = ProductLikeEntity.builder()
                     .product(product)
                     .user(user)

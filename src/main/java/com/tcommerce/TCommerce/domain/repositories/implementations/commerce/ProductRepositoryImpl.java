@@ -50,6 +50,16 @@ public class ProductRepositoryImpl implements ProductRepository {
                 if (filter.categoryId() != null && !filter.categoryId().isEmpty()) {
                     predicates.add(cb.equal(root.get("category").get("id"), filter.categoryId()));
                 }
+                if (filter.isActive() != null) {
+                    predicates.add(cb.equal(root.get("isActive"), filter.isActive()));
+                }
+                if (filter.isDeleted() != null) {
+                    if (filter.isDeleted()) {
+                        predicates.add(cb.isNotNull(root.get("deletedAt")));
+                    } else {
+                        predicates.add(cb.isNull(root.get("deletedAt")));
+                    }
+                }
             }
             return cb.and(predicates.toArray(new Predicate[0]));
         };
@@ -60,10 +70,6 @@ public class ProductRepositoryImpl implements ProductRepository {
                 .scroll(position))
                 .map(productMapper::toDomain);
     }
-
-    /**
-     * Builds the JPQL query string with dynamic ORDER BY.
-     */
 
     @Override
     @Transactional

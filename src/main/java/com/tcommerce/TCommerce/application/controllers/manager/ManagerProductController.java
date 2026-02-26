@@ -11,6 +11,14 @@ import com.tcommerce.TCommerce.domain.entities.commerce.ProductImage;
 import jakarta.validation.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import com.tcommerce.TCommerce.application.query.ProductPaginationRequest;
+import com.tcommerce.TCommerce.application.query.ProductFilter;
+import com.tcommerce.TCommerce.application.services.common.PageProcessor;
+import com.tcommerce.TCommerce.domain.models.PaginationCriteria;
+import com.tcommerce.TCommerce.interfaces.dto.commerce.product.ProductListResponse;
+import org.springframework.data.domain.Window;
+import org.springframework.data.domain.ScrollPosition;
+import org.springframework.data.domain.Sort;
 
 import java.net.URI;
 import java.util.List;
@@ -24,9 +32,44 @@ import org.springframework.security.access.prepost.PreAuthorize;
 @RequestMapping(ApiPaths.V1 + "/manager/products")
 @PreAuthorize("hasAnyRole('MANAGER')")
 @RequiredArgsConstructor
-public class ManagerProductController {
+public class ManagerProductController extends PageProcessor {
 
     private final ProductService productService;
+
+    @GetMapping
+    public ResponseEntity<Window<ProductListResponse>> getAllProducts(
+            ProductPaginationRequest request) {
+            
+        ProductFilter filter = new ProductFilter(
+            request.name(), 
+            request.categoryId(), 
+            request.isActive(), 
+            request.isDeleted()
+        );
+        
+        PaginationCriteria criteria = processRequest(request);
+
+        ScrollPosition position = ScrollPosition.keyset();
+
+        Sort sort = Sort.unsorted();
+        if (request.sortBy() != null) {
+            Sort.Direction direction = "desc".equalsIgnoreCase(request.sortOrder()) 
+                    ? Sort.Direction.DESC 
+                    : Sort.Direction.ASC;
+            sort = Sort.by(direction, request.sortBy());
+        }
+
+        if (sort.isUnsorted()) {
+             sort = Sort.by("id").descending();
+        }
+        
+        int limit = criteria.limit();
+        
+        Window<Product> result = productService.getAllProducts(filter, position, limit, sort);
+        
+        Window<ProductListResponse> response = result.map(Product::toResponse);
+        return ResponseEntity.ok(response);
+    }
     
     @PostMapping
     public ResponseEntity<ProductFullResponse> createProduct(@Valid @RequestBody CreateProductRequest request) {

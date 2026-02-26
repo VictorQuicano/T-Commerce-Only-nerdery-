@@ -23,32 +23,31 @@ public class ProductMapper {
     public Product toDomain(ProductEntity entity) {
         if (entity == null) return null;
 
-        return new Product(
-                entity.getId(),
-                entity.getName(),
-                entity.getDescription(),
-                entity.getPrice(),
-                categoryMapper.toDomain(entity.getCategory()),
-                toDomain(entity.getStock()),
-                productImageMapper.toDomainList(entity.getImages()),
-                entity.getDeletedAt(),
-                entity.getCreatedAt(),
-                entity.getUpdatedAt()
-        );
+        return Product.builder()
+                .id(entity.getId())
+                .name(entity.getName())
+                .description(entity.getDescription())
+                .price(entity.getPrice())
+                .isActive(entity.isActive())
+                .category(categoryMapper.toDomain(entity.getCategory()))
+                .stock(toDomain(entity.getStock()))
+                .images(productImageMapper.toDomainList(entity.getImages()))
+                .deletedAt(entity.getDeletedAt())
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
+                .build();
     }
 
     public ProductEntity toEntity(Product domain) {
         if (domain == null) return null;
 
-        ProductEntity entity = new ProductEntity(
-                domain.getId(),
-                domain.getName(),
-                domain.getDescription(),
-                domain.getPrice(),
-                domain.getCreatedAt(),
-                domain.getUpdatedAt(),
-                domain.getDeletedAt()
-        );
+        ProductEntity entity = ProductEntity.builder()
+                .id(domain.getId())
+                .name(domain.getName())
+                .description(domain.getDescription())
+                .price(domain.getPrice())
+                .isActive(domain.isActive())
+                .build();
 
         if (domain.getCategory() != null) {
             entity.setCategory(categoryMapper.toEntity(domain.getCategory()));
