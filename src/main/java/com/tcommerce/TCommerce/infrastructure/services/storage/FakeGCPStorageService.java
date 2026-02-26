@@ -10,7 +10,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-@Primary
 public class FakeGCPStorageService implements StorageService {
 
     @Override
