@@ -103,6 +103,26 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
+    public Order cancelOrder(Order order, String userId, String reason) {
+        OrderStatus currentStatus = order.getStatus();
+
+        OrderStatusHistory history = OrderStatusHistory.builder()
+                .orderId(order.getId())
+                .fromStatus(currentStatus)
+                .toStatus(OrderStatus.CANCELLED)
+                .changedAt(LocalDateTime.now())
+                .changedBy(userId)
+                .reason(reason)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        order.setStatus(OrderStatus.CANCELLED);
+        order.setUpdatedAt(LocalDateTime.now());
+        order.getStatusHistory().add(history);
+
+        return orderRepository.save(order);
+    }
+
     public Order initiatePayment(String orderId, String paymentIntentId, String userId) {
         Order order = getOrderById(orderId);
         OrderStatus currentStatus = order.getStatus();

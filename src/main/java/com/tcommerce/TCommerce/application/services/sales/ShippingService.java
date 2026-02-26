@@ -9,6 +9,7 @@ import com.tcommerce.TCommerce.domain.repositories.interfaces.auth.UserRepositor
 import com.tcommerce.TCommerce.domain.entities.auth.User;
 
 import org.springframework.stereotype.Service;
+import com.tcommerce.TCommerce.domain.entities.sales.OrderStatus;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +24,7 @@ public class ShippingService {
     private final ProductService productService;
     private final UserRepository userRepository;
     private final StockNotificationService stockNotificationService;
-
+    private final OrderService orderService;
 
     public void startShipping(Order order) {
         String userId = order.getUserId();
@@ -32,7 +33,7 @@ public class ShippingService {
         order.getItems().stream().forEach(item -> {
             checkStock(item, user);
         });
-        
+        order = orderService.updateOrderStatus(order.getId(), OrderStatus.SHIPPED, "SYSTEM", "Order shipped");
     }
 
     private void checkStock(OrderItem order, User user) {
@@ -42,6 +43,7 @@ public class ShippingService {
         }
         if (!productService.hasEnoughStock(product, BigInteger.valueOf(order.getQuantity()))){
             stockNotificationService.notifyUserNotEnoughStock(product, user);
+            return;
         }
         productService.reduceStock(product, BigInteger.valueOf(order.getQuantity()));
     }

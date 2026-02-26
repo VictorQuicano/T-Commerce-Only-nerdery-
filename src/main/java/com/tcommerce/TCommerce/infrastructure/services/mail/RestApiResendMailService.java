@@ -1,9 +1,8 @@
 package com.tcommerce.TCommerce.infrastructure.services.mail;
 
-import com.resend.*;
 import com.resend.Resend;
-import com.resend.services.emails.model.SendEmailRequest;
-import com.resend.services.emails.model.SendEmailResponse;
+import com.resend.services.emails.model.CreateEmailOptions;
+import com.resend.services.emails.model.CreateEmailResponse;
 import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Personalization;
 import com.tcommerce.TCommerce.application.services.common.HtmlBodyGenerator;
@@ -41,17 +40,25 @@ public class RestApiResendMailService implements MailService {
 
     @Override
     public void send(EmailEvent event) {
+
         Resend resend = new Resend(apiKey);
 
         String htmlBody = htmlBodyGenerator.generateHtml(event);
 
-        SendEmailRequest sendEmailRequest = SendEmailRequest.builder()
+        CreateEmailOptions params = CreateEmailOptions.builder()
                 .from(fromAddress)
-                .to(event.getTo())
+                //.to(event.getTo())
+                .to("alejandroxd25k@gmail.com")
                 .subject(event.getSubject())
                 .html(htmlBody)
                 .build();
-
-        SendEmailResponse data = resend.emails().send(sendEmailRequest);
+        try{
+            CreateEmailResponse response = resend.emails().send(params);
+    
+            log.info("Email sent with id: {}", response.getId());
+        } catch (Exception e) {
+            log.error("Failed to send email", e);
+            throw new MailSendException("Failed to send email");
+        }
     }
 }
