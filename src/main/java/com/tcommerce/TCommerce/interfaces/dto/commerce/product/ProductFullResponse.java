@@ -1,6 +1,6 @@
 package com.tcommerce.TCommerce.interfaces.dto.commerce.product;
 
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -10,7 +10,7 @@ public record ProductFullResponse(
     String id,
     String name,
     String description,
-    BigDecimal price,
+    BigInteger price,
     CategoryResponse category,
     ProductStockResponse stockQuantity,
     List<ProductImageResponse> imageUrls,

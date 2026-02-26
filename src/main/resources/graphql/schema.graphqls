@@ -1,0 +1,113 @@
+# ===== Enums =====
+
+enum OrderStatus {
+    PENDING
+    AWAITING_PAYMENT
+    PAID
+    PAYMENT_FAILED
+    CANCELLED
+    SHIPPED
+    DELIVERED
+}
+
+enum UserRole {
+    CLIENT
+    MANAGER
+}
+
+# ===== Types =====
+
+type Category {
+    id: ID!
+    name: String!
+}
+
+type Product {
+    id: ID!
+    name: String!
+    description: String
+    price: String!
+    stock: Int!
+    category: Category
+    disabled: Boolean!
+    createdAt: String!
+}
+
+type User {
+    id: ID!
+    email: String!
+    role: UserRole!
+}
+
+type OrderItem {
+    product: Product!
+    quantity: Int!
+    price: String!
+}
+
+type Order {
+    id: ID!
+    userId: String!
+    items: [OrderItem!]!
+    total: String!
+    status: OrderStatus!
+    createdAt: String!
+    updatedAt: String!
+}
+
+type CartItem {
+    product: Product!
+    quantity: Int!
+}
+
+type Cart {
+    id: ID!
+    items: [CartItem!]!
+    total: String!
+}
+
+# ===== Relay-style Cursor Pagination =====
+
+type PageInfo {
+    hasNextPage: Boolean!
+    hasPreviousPage: Boolean!
+    startCursor: String
+    endCursor: String
+}
+
+type OrderEdge {
+    cursor: String!
+    node: Order!
+}
+
+type OrderConnection {
+    edges: [OrderEdge!]!
+    pageInfo: PageInfo!
+}
+
+# ===== Queries =====
+
+type Query {
+    managerOrders(first: Int, after: String, status: OrderStatus): OrderConnection!
+    myOrders(first: Int, after: String): OrderConnection!
+}
+
+# ===== Mutations =====
+
+type Mutation {
+    # Order
+    createOrderFromCart: Order!
+    updateDeliveryStatus(orderId: ID!, status: OrderStatus!): Order!
+
+    # Cart
+    addToCart(productId: ID!, quantity: Int!): Cart!
+    removeFromCart(productId: ID!): Cart!
+    clearCart: Cart!
+
+    # Product (Manager)
+    deleteProduct(productId: ID!): Boolean!
+    disableProduct(productId: ID!): Product!
+
+    # Like
+    toggleLike(productId: ID!): Boolean!
+}

@@ -11,5 +11,6 @@ public interface UserRepository   {
     List<User> findAll();
     Optional<User> findById(String id);
     void deleteById(String id);
-
+    List<User> findManagers();
+    List<User> findUsersWhoLikedProduct(String productId);
 }

@@ -7,6 +7,7 @@ import com.tcommerce.TCommerce.interfaces.dto.commerce.product.CreateProductRequ
 import com.tcommerce.TCommerce.interfaces.dto.commerce.product.ProductFullResponse;
 import com.tcommerce.TCommerce.interfaces.dto.commerce.product.UpdateProductRequest;
 
+import com.tcommerce.TCommerce.domain.entities.commerce.ProductImage;
 import jakarta.validation.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -95,7 +96,6 @@ public class ManagerProductController extends PageProcessor {
 
     @DeleteMapping("/{id}/images/{imageId}")
     public ResponseEntity<Void> removeImage(
-            @PathVariable String id,
             @PathVariable String imageId) {
         productService.removeProductImage(id, imageId);
         return ResponseEntity.noContent().build();

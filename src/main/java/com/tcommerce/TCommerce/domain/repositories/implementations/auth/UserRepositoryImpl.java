@@ -2,8 +2,13 @@ package com.tcommerce.TCommerce.domain.repositories.implementations.auth;
 
 import com.tcommerce.TCommerce.domain.entities.auth.User;
 import com.tcommerce.TCommerce.domain.repositories.interfaces.auth.UserRepository;
+import com.tcommerce.TCommerce.infrastructure.persistence.entities.auth.ERole;
 import com.tcommerce.TCommerce.infrastructure.persistence.mappers.auth.UserMapper;
 import com.tcommerce.TCommerce.infrastructure.persistence.repositories.auth.JpaUserRepository;
+import com.tcommerce.TCommerce.infrastructure.persistence.repositories.commerce.JpaProductLikeRepository;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -11,15 +16,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
+@RequiredArgsConstructor
 public class UserRepositoryImpl implements UserRepository {
     
     private final JpaUserRepository jpaUserRepository;
+    private final JpaProductLikeRepository jpaLikeRepository;
     private final UserMapper userMapper;
-
-    public UserRepositoryImpl(JpaUserRepository jpaUserRepository, UserMapper userMapper) {
-        this.jpaUserRepository = jpaUserRepository;
-        this.userMapper = userMapper;
-    }
 
     @Override
     public List<User> findAll() {
@@ -54,4 +56,20 @@ public class UserRepositoryImpl implements UserRepository {
     public Boolean existsByEmail(String email) {
         return jpaUserRepository.existsByEmail(email);
     }
+
+    @Override
+    public List<User> findManagers() {
+        return jpaUserRepository.findByRole(ERole.MANAGER).stream()
+                .map(userMapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<User> findUsersWhoLikedProduct(String productId) {
+        return jpaLikeRepository.findByProductId(productId).stream()
+                .map(jpaLike -> jpaLike.getUser())
+                .map(userMapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
 }

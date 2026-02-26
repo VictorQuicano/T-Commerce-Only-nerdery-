@@ -2,7 +2,8 @@ package com.tcommerce.TCommerce.domain.repositories.implementations.auth;
 
 import com.tcommerce.TCommerce.domain.entities.auth.PasswordResetToken;
 import com.tcommerce.TCommerce.domain.entities.auth.User;
-import com.tcommerce.TCommerce.domain.repositories.auth.PasswordResetTokenRepository;
+import com.tcommerce.TCommerce.domain.repositories.interfaces.auth.PasswordResetTokenRepository;
+
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -20,10 +21,6 @@ public class PasswordResetTokenRepositoryImpl implements PasswordResetTokenRepos
         if (token.getId() == null) {
             token.setId(UUID.randomUUID().toString());
         }
-        // Remove existing token for same user if any, to avoid duplicates (optional logic)
-        // For simplicity in this in-memory repo, we just add.
-        // A real DB would handle this with constraints or updates.
-        // Let's remove any existing token with same ID to simulate update
         tokens.removeIf(t -> t.getId().equals(token.getId()));
         tokens.add(token);
         return token;
