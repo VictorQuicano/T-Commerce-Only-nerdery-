@@ -6,6 +6,8 @@ import com.google.cloud.storage.Storage;
 import com.google.cloud.WriteChannel;
 import com.tcommerce.TCommerce.config.BucketConfig;
 import com.tcommerce.TCommerce.domain.services.StorageService;
+
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 
 
 @Service
+@Primary
 public class GCPStorageService implements StorageService {
 
     private final Storage storage;
