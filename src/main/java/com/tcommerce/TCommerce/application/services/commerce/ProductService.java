@@ -60,7 +60,6 @@ public class ProductService {
             throw new AlreadyExistsException("Product already exists with name: " + request.name(), "PRODUCT_ALREADY_EXISTS");
         }
 
-        String productId = UUID.randomUUID().toString();
         LocalDateTime now = LocalDateTime.now();
 
         Stock stock = new Stock(
@@ -73,7 +72,6 @@ public class ProductService {
                 .orElseThrow(() -> new RuntimeException("Category not found with id: " + request.categoryId()));
         
         Product product = Product.builder()
-                //.id(productId)
                 .name(request.name())
                 .description(request.description())
                 .price(request.price())

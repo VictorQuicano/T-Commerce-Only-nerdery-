@@ -96,6 +96,7 @@ public class ManagerProductController extends PageProcessor {
 
     @DeleteMapping("/{id}/images/{imageId}")
     public ResponseEntity<Void> removeImage(
+            @PathVariable String id,
             @PathVariable String imageId) {
         productService.removeProductImage(id, imageId);
         return ResponseEntity.noContent().build();
