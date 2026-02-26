@@ -1,0 +1,19 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: ['build', '-t', 'southamerica-west1-docker.pkg.dev/tesis-experiment/tcommerce-repo/tcommerce-api:v1', '.']
+
+  - name: gcr.io/cloud-builders/docker
+    args: ['push', 'southamerica-west1-docker.pkg.dev/tesis-experiment/tcommerce-repo/tcommerce-api:v1']
+
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - tcommerce
+      - --image=southamerica-west1-docker.pkg.dev/tesis-experiment/tcommerce-repo/tcommerce-api:v1
+      - --region=southamerica-west1
+      - --platform=managed
+
+options:
+  logging: CLOUD_LOGGING_ONLY
