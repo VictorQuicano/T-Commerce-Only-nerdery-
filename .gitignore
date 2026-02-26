@@ -35,3 +35,5 @@ build/
 
 ### ENVIRONMENT ###
 .env
+.env.production
+deployment.production.md
