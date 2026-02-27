@@ -16,6 +16,7 @@ import com.tcommerce.TCommerce.domain.repositories.interfaces.sales.RefundReposi
 import com.tcommerce.TCommerce.interfaces.dto.sales.CheckoutResponse;
 import com.tcommerce.TCommerce.interfaces.dto.sales.OrderItemResponse;
 import com.tcommerce.TCommerce.application.services.sales.ShippingService;
+import com.tcommerce.TCommerce.application.services.sales.RefundNotification;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +38,7 @@ public class PaymentService {
     private final ProcessedStripeEventRepository processedStripeEventRepository;
     private final ShippingService shippingService;
     private final RefundRepository refundRepository;
+    private final RefundNotification refundNotification;
 
     @Value("${stripe.webhook-secret}")
     private String webhookSecret;
@@ -189,6 +191,7 @@ public class PaymentService {
             order.getRefunds().add(savedRefund);
             orderService.save(order);
 
+            refundNotification.notifyRefund(order.getId(), order.getUserId(), reason);
             return savedRefund;
 
         } catch (StripeException e) {
