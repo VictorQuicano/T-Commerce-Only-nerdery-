@@ -134,6 +134,14 @@ public class EmailGenerator {
                 data.put("button_url", "https://t-commerce.com/orders/{{order_id}}");
                 break;
 
+            case "refund":
+                data.put("email_greeting", "Refund Update 📦");
+                data.put("email_title", "Your refund has been processed");
+                data.put("email_body", emailBody);
+                data.put("button_text", "VIEW ORDER 📦");
+                data.put("button_url", "https://t-commerce.com/orders/{{order_id}}");
+                break;
+
             default:
                 data.put("email_greeting", "Hello!");
                 data.put("email_title", templateName);
