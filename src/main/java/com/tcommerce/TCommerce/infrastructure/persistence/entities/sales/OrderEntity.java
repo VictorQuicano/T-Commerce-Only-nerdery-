@@ -43,6 +43,9 @@ public class OrderEntity{
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderStatusHistoryEntity> statusHistory;
 
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RefundEntity> refunds;
+
     @Column(name = "payment_intent_id")
     private String paymentIntentId;
 

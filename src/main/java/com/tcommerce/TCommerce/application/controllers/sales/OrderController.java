@@ -3,12 +3,12 @@ package com.tcommerce.TCommerce.application.controllers.sales;
 import com.tcommerce.TCommerce.application.controllers.ApiPaths;
 import com.tcommerce.TCommerce.application.services.sales.OrderService;
 import com.tcommerce.TCommerce.infrastructure.security.services.UserDetailsImpl;
-import com.tcommerce.TCommerce.interfaces.dto.sales.OrderHistoryResponse;
 import com.tcommerce.TCommerce.interfaces.dto.sales.OrderResponse;
 import com.tcommerce.TCommerce.interfaces.dto.sales.OrderWithHistory;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 import org.springframework.security.access.AccessDeniedException;
 
 import com.tcommerce.TCommerce.domain.entities.sales.Order;
@@ -56,7 +56,7 @@ public class OrderController {
     }
 
     @PostMapping("/{orderId}/cancel")
-    public ResponseEntity<OrderWithHistory> cancelOrder(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable String orderId, @RequestBody @Valid @NotBlank String reason) {
+    public ResponseEntity<OrderWithHistory> cancelOrder(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable String orderId, @RequestBody @Valid @Size(min = 1, max = 255) String reason) {
         String userId = userDetails.getId();
         Order order = orderService.getOrderById(orderId);
         if (!order.getUserId().equals(userId)) {

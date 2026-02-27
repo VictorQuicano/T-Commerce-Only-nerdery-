@@ -5,9 +5,9 @@ import com.tcommerce.TCommerce.domain.entities.commerce.Product;
 import com.tcommerce.TCommerce.domain.entities.sales.*;
 import com.tcommerce.TCommerce.domain.repositories.interfaces.sales.OrderRepository;
 import com.tcommerce.TCommerce.domain.exceptions.CartEmptyException;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.ScrollPosition;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Window;
@@ -24,7 +24,6 @@ import com.tcommerce.TCommerce.application.services.commerce.ProductService;
 
 @Service
 @Transactional
-@RequiredArgsConstructor
 @Slf4j
 public class OrderService {
 
@@ -32,6 +31,20 @@ public class OrderService {
     private final CartService cartService;
     private final ChangeStatusNotificationService changeStatusNotificationService; 
     private final ProductService productService;
+    private final PaymentService paymentService;
+
+    public OrderService(
+            OrderRepository orderRepository,
+            CartService cartService,
+            ChangeStatusNotificationService changeStatusNotificationService,
+            ProductService productService,
+            @Lazy PaymentService paymentService) {
+        this.orderRepository = orderRepository;
+        this.cartService = cartService;
+        this.changeStatusNotificationService = changeStatusNotificationService;
+        this.productService = productService;
+        this.paymentService = paymentService;
+    }
 
     public Window<Order> getAllOrders(OrderFilter filter, ScrollPosition position, int limit, Sort sort) {
         return orderRepository.findAll(position, limit, filter, sort);
@@ -139,6 +152,21 @@ public class OrderService {
         order = restockOrder(order);
 
         Order savedOrder = orderRepository.save(order);
+
+        // Process refund if order was paid
+        if (currentStatus == OrderStatus.PAID || currentStatus == OrderStatus.SHIPPED) {
+            try {
+                BigInteger totalAmount = order.getItems().stream()
+                        .map(item -> item.getPrice().multiply(BigInteger.valueOf(item.getQuantity())))
+                        .reduce(BigInteger.ZERO, BigInteger::add);
+                
+                paymentService.refundOrder(savedOrder, totalAmount, reason);
+                log.info("Refund processed for cancelled order {}", savedOrder.getId());
+            } catch (Exception e) {
+                log.error("Failed to process refund for order {}: {}", savedOrder.getId(), e.getMessage());
+            }
+        }
+
         changeStatusNotificationService.notifyStatusChange(savedOrder.getId(), currentStatus, OrderStatus.CANCELLED, userId, reason);
         return savedOrder;
     }
