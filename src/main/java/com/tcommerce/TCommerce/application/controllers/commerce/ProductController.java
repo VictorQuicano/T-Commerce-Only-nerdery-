@@ -1,5 +1,11 @@
 package com.tcommerce.TCommerce.application.controllers.commerce;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.Parameter;
 import com.tcommerce.TCommerce.application.controllers.ApiPaths;
 import com.tcommerce.TCommerce.application.query.ProductPaginationRequest;
 import com.tcommerce.TCommerce.application.query.ProductFilter;
@@ -19,13 +25,21 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping(ApiPaths.V1 + "/products")
 @RequiredArgsConstructor
+@Tag(name = "Commerce", description = "Public endpoints for browsing products and categories")
 public class ProductController extends PageProcessor {
 
     private final ProductService productService;
 
+    @Operation(
+        summary = "Get all products with filters",
+        description = "Returns a paginated list of products based on filters like name and category.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Products retrieved successfully")
+        }
+    )
     @GetMapping
     public ResponseEntity<Window<ProductListResponse>> getAllProducts(
-            ProductPaginationRequest request) {
+            @Parameter(description = "Pagination and filter parameters") ProductPaginationRequest request) {
             
         ProductFilter filter = new ProductFilter(request.name(), request.categoryId(), true, false);
         
@@ -53,8 +67,18 @@ public class ProductController extends PageProcessor {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(
+        summary = "Get product by ID",
+        description = "Returns full details of a specific product.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Product found", 
+                         content = @Content(schema = @Schema(implementation = ProductFullResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Product not found")
+        }
+    )
     @GetMapping("/{id}")
-    public ResponseEntity<ProductFullResponse> getProductById(@PathVariable String id) {
+    public ResponseEntity<ProductFullResponse> getProductById(
+            @Parameter(description = "The unique identifier of the product") @PathVariable String id) {
         Product product = productService.getProductById(id);
         return ResponseEntity.ok(product.toFullResponse());
     }

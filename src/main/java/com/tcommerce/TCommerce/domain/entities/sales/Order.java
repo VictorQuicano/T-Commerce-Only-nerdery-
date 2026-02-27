@@ -26,6 +26,8 @@ public class Order implements BaseEntity {
     private List<OrderItem> items = new ArrayList<>();
     @Builder.Default
     private List<OrderStatusHistory> statusHistory = new ArrayList<>();
+    @Builder.Default
+    private List<Refund> refunds = new ArrayList<>();
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime deletedAt;

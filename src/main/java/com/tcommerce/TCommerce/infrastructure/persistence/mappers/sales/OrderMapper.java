@@ -8,6 +8,7 @@ import com.tcommerce.TCommerce.infrastructure.persistence.entities.commerce.Prod
 import com.tcommerce.TCommerce.infrastructure.persistence.entities.sales.OrderEntity;
 import com.tcommerce.TCommerce.infrastructure.persistence.entities.sales.OrderItemEntity;
 import com.tcommerce.TCommerce.infrastructure.persistence.entities.sales.OrderStatusHistoryEntity;
+import com.tcommerce.TCommerce.infrastructure.persistence.entities.sales.RefundEntity;
 import com.tcommerce.TCommerce.infrastructure.persistence.repositories.auth.JpaUserRepository;
 import com.tcommerce.TCommerce.infrastructure.persistence.repositories.commerce.JpaProductRepository;
 import org.springframework.stereotype.Component;
@@ -21,10 +22,12 @@ public class OrderMapper {
 
     private final JpaUserRepository userRepository;
     private final JpaProductRepository productRepository;
+    private final RefundMapper refundMapper;
 
-    public OrderMapper(JpaUserRepository userRepository, JpaProductRepository productRepository) {
+    public OrderMapper(JpaUserRepository userRepository, JpaProductRepository productRepository, RefundMapper refundMapper) {
         this.userRepository = userRepository;
         this.productRepository = productRepository;
+        this.refundMapper = refundMapper;
     }
 
     public Order toDomain(OrderEntity entity) {
@@ -36,6 +39,7 @@ public class OrderMapper {
                 .status(entity.getStatus())
                 .items(entity.getItems().stream().map(this::toDomain).collect(Collectors.toCollection(ArrayList::new)))
                 .statusHistory(entity.getStatusHistory().stream().map(this::toDomain).collect(Collectors.toCollection(ArrayList::new)))
+                .refunds(entity.getRefunds() != null ? entity.getRefunds().stream().map(refundMapper::toDomain).collect(Collectors.toCollection(ArrayList::new)) : new ArrayList<>())
                 .paymentIntentId(entity.getPaymentIntentId())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
@@ -96,6 +100,13 @@ public class OrderMapper {
                 .map(history -> toEntity(history, entity))
                 .collect(Collectors.toCollection(ArrayList::new));
         entity.setStatusHistory(historyEntities);
+
+        if (domain.getRefunds() != null) {
+            List<RefundEntity> refundEntities = domain.getRefunds().stream()
+                    .map(refundMapper::toEntity)
+                    .collect(Collectors.toCollection(ArrayList::new));
+            entity.setRefunds(refundEntities);
+        }
 
         return entity;
     }

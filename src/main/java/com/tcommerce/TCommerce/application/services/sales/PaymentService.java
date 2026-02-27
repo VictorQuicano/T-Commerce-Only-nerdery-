@@ -4,12 +4,15 @@ import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Event;
 import com.stripe.model.PaymentIntent;
+import com.stripe.model.Refund;
+import com.stripe.param.RefundCreateParams;
 import com.stripe.net.Webhook;
 import com.stripe.param.PaymentIntentCreateParams;
 import com.tcommerce.TCommerce.domain.entities.sales.Order;
 import com.tcommerce.TCommerce.domain.entities.sales.OrderStatus;
 import com.tcommerce.TCommerce.domain.entities.sales.ProcessedStripeEvent;
 import com.tcommerce.TCommerce.domain.repositories.interfaces.sales.ProcessedStripeEventRepository;
+import com.tcommerce.TCommerce.domain.repositories.interfaces.sales.RefundRepository;
 import com.tcommerce.TCommerce.interfaces.dto.sales.CheckoutResponse;
 import com.tcommerce.TCommerce.interfaces.dto.sales.OrderItemResponse;
 import com.tcommerce.TCommerce.application.services.sales.ShippingService;
@@ -33,6 +36,7 @@ public class PaymentService {
     private final OrderService orderService;
     private final ProcessedStripeEventRepository processedStripeEventRepository;
     private final ShippingService shippingService;
+    private final RefundRepository refundRepository;
 
     @Value("${stripe.webhook-secret}")
     private String webhookSecret;
@@ -49,6 +53,7 @@ public class PaymentService {
         if (order.getStatus() != OrderStatus.PENDING && order.getStatus() != OrderStatus.PAYMENT_FAILED) {
             throw new RuntimeException("Order is not in a valid state for checkout. Current status: " + order.getStatus());
         }
+        order = shippingService.reserveStock(order);
 
         // Calculate total from order items
         BigInteger totalAmount = order.getItems().stream()
@@ -152,5 +157,43 @@ public class PaymentService {
 
         log.info("Payment failed for order {}, payment intent {}", orderId, paymentIntent.getId());
         orderService.updateOrderStatus(orderId, OrderStatus.PAYMENT_FAILED, "SYSTEM", "Payment failed via Stripe");
+    }
+
+    public com.tcommerce.TCommerce.domain.entities.sales.Refund refundOrder(Order order, BigInteger amount, String reason) {
+        if (order.getPaymentIntentId() == null) {
+            throw new RuntimeException("Cannot refund order without payment intent ID");
+        }
+
+        try {
+            RefundCreateParams params = RefundCreateParams.builder()
+                    .setPaymentIntent(order.getPaymentIntentId())
+                    .setAmount(amount.longValueExact())
+                    .putMetadata("orderId", order.getId())
+                    .setReason(RefundCreateParams.Reason.REQUESTED_BY_CUSTOMER)
+                    .build();
+
+            Refund stripeRefund = Refund.create(params);
+
+            com.tcommerce.TCommerce.domain.entities.sales.Refund refund = com.tcommerce.TCommerce.domain.entities.sales.Refund.builder()
+                    .orderId(order.getId())
+                    .amount(amount)
+                    .status(stripeRefund.getStatus())
+                    .stripeRefundId(stripeRefund.getId())
+                    .reason(reason)
+                    .createdAt(LocalDateTime.now())
+                    .build();
+
+            com.tcommerce.TCommerce.domain.entities.sales.Refund savedRefund = refundRepository.save(refund);
+            
+            // Add refund to order and save
+            order.getRefunds().add(savedRefund);
+            orderService.save(order);
+
+            return savedRefund;
+
+        } catch (StripeException e) {
+            log.error("Stripe refund error for order {}: {}", order.getId(), e.getMessage());
+            throw new RuntimeException("Failed to process refund via Stripe: " + e.getMessage(), e);
+        }
     }
 }

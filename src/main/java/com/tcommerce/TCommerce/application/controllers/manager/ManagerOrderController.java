@@ -1,5 +1,13 @@
 package com.tcommerce.TCommerce.application.controllers.manager;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,11 +43,21 @@ import com.tcommerce.TCommerce.interfaces.dto.sales.UpdateOrderStatus;
 @RequestMapping(ApiPaths.V1 + "/manager/orders")
 @PreAuthorize("hasAnyRole('MANAGER')")
 @RequiredArgsConstructor
+@Tag(name = "Admin Management", description = "Administrative endpoints for managing products, categories, and orders")
+@SecurityRequirement(name = "bearerAuth")
 public class ManagerOrderController extends PageProcessor {
     private final OrderService orderService;
 
+    @Operation(
+        summary = "Get all orders (Admin View)",
+        description = "Administrative endpoint to list and filter orders across all users.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Orders retrieved successfully")
+        }
+    )
     @GetMapping
-    public ResponseEntity<Window<OrderResponse>> getAllOrders(OrderPaginationRequest request) {
+    public ResponseEntity<Window<OrderResponse>> getAllOrders(
+            @Parameter(description = "Pagination and filter parameters") OrderPaginationRequest request) {
         OrderFilter filter = new OrderFilter(request.status(), request.userId());
         
         PaginationCriteria criteria = processRequest(request);
@@ -66,10 +84,21 @@ public class ManagerOrderController extends PageProcessor {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(
+        summary = "Update order status",
+        description = "Administrative endpoint to change the status of an order (e.g., from PAID to SHIPPED).",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Order status updated successfully",
+                         content = @Content(schema = @Schema(implementation = OrderWithHistory.class))),
+            @ApiResponse(responseCode = "404", description = "Order not found"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - Manager access required")
+        }
+    )
     @PatchMapping("/{orderId}")
     public ResponseEntity<OrderWithHistory> updateOrderStatus(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
-        @PathVariable String orderId, @RequestBody @Valid UpdateOrderStatus request) {
+        @Parameter(description = "The unique identifier of the order") @PathVariable String orderId, 
+        @Valid @RequestBody UpdateOrderStatus request) {
         String userId = userDetails.getId();
         String reason = request.reason();
         Order order = orderService.updateOrderStatus(orderId, request.status(), userId, reason);
