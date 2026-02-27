@@ -23,6 +23,7 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final CartService cartService;
+    private final ChangeStatusNotificationService changeStatusNotificationService; 
 
     public Window<Order> getAllOrders(OrderFilter filter, ScrollPosition position, int limit, Sort sort) {
         return orderRepository.findAll(position, limit, filter, sort);
@@ -57,19 +58,20 @@ public class OrderService {
                 .collect(Collectors.toList());
 
         order.setItems(orderItems);
-
+        String reason = "Order created";
         OrderStatusHistory initialHistory = OrderStatusHistory.builder()
                 .fromStatus(null)
                 .toStatus(OrderStatus.PENDING)
                 .changedAt(now)
                 .changedBy(userId)
-                .reason("Order created")
+                .reason(reason)
                 .createdAt(now)
                 .build();
         order.getStatusHistory().add(initialHistory);
 
         Order savedOrder = orderRepository.save(order);
         cartService.clearCart(userId);
+        changeStatusNotificationService.notifyStatusChange(savedOrder.getId(), null, OrderStatus.PENDING, userId, reason);
         return savedOrder;
     }
 
@@ -100,7 +102,9 @@ public class OrderService {
         order.setUpdatedAt(LocalDateTime.now());
         order.getStatusHistory().add(history);
 
-        return orderRepository.save(order);
+        Order savedOrder = orderRepository.save(order);
+        changeStatusNotificationService.notifyStatusChange(savedOrder.getId(), currentStatus, nextStatus, userId, reason);
+        return savedOrder;
     }
 
     public Order cancelOrder(Order order, String userId, String reason) {
@@ -120,7 +124,9 @@ public class OrderService {
         order.setUpdatedAt(LocalDateTime.now());
         order.getStatusHistory().add(history);
 
-        return orderRepository.save(order);
+        Order savedOrder = orderRepository.save(order);
+        changeStatusNotificationService.notifyStatusChange(savedOrder.getId(), currentStatus, OrderStatus.CANCELLED, userId, reason);
+        return savedOrder;
     }
 
     public Order initiatePayment(String orderId, String paymentIntentId, String userId) {
@@ -143,7 +149,9 @@ public class OrderService {
         order.setUpdatedAt(LocalDateTime.now());
         order.getStatusHistory().add(history);
 
-        return orderRepository.save(order);
+        Order savedOrder = orderRepository.save(order);
+        changeStatusNotificationService.notifyStatusChange(savedOrder.getId(), currentStatus, OrderStatus.AWAITING_PAYMENT, userId, "Payment initiated");
+        return savedOrder;
     }
 }
 

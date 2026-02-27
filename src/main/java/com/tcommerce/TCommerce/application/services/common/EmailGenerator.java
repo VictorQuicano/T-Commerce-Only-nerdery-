@@ -20,10 +20,13 @@ public class EmailGenerator {
 
         switch (templateName) {
             case "welcome":
-                data.put("email_greeting", "Welcome aboard!");
-                data.put("email_title", "We're glad you're here!");
-                data.put("email_body", emailBody);
-                data.put("button_text", "START SHOPPING");
+                data.put("email_greeting", "Welcome to T-Commerce! 🎉");
+                data.put("email_title", "We're excited to have you with us!");
+                data.put("email_body", 
+                    "Your account has been successfully created and you're all set to start shopping. " +
+                    "Discover amazing products, great deals, and a seamless shopping experience made just for you."
+                );
+                data.put("button_text", "START SHOPPING 🛍️");
                 data.put("button_url", "https://t-commerce.com/shop");
                 break;
 
@@ -80,6 +83,55 @@ public class EmailGenerator {
                 data.put("email_body", emailBody);
                 data.put("button_text", "UPDATE CART");
                 data.put("button_url", "https://t-commerce.com/cart");
+                break;
+            case "order-pending":
+                data.put("email_greeting", "We received your order! 🧾");
+                data.put("email_title", "Your order is being reviewed");
+                data.put("email_body", emailBody);
+                data.put("button_text", "VIEW ORDER 👀");
+                data.put("button_url", "https://t-commerce.com/orders/{{order_id}}");
+                break;
+            case "order-awaiting_payment":
+                data.put("email_greeting", "Almost there! 💳");
+                data.put("email_title", "Your order is awaiting payment");
+                data.put("email_body", emailBody);
+                data.put("button_text", "COMPLETE PAYMENT ✅");
+                data.put("button_url", "https://t-commerce.com/orders/{{order_id}}");
+                break;
+            case "order-paid":
+                data.put("email_greeting", "Payment confirmed! 🎉");
+                data.put("email_title", "We're preparing your order");
+                data.put("email_body", emailBody);
+                data.put("button_text", "VIEW ORDER 📦");
+                data.put("button_url", "https://t-commerce.com/orders/{{order_id}}");
+                break;
+            case "order-payment_failed":
+                data.put("email_greeting", "Oops! Payment issue ❌");
+                data.put("email_title", "We couldn't process your payment");
+                data.put("email_body", emailBody);
+                data.put("button_text", "RETRY PAYMENT 🔁");
+                data.put("button_url", "https://t-commerce.com/orders/{{order_id}}");
+                break;
+            case "order-cancelled":
+                data.put("email_greeting", "Order update 🚫");
+                data.put("email_title", "Your order has been cancelled");
+                data.put("email_body", emailBody);
+                data.put("button_text", "CONTACT SUPPORT 💬");
+                data.put("button_url", "https://t-commerce.com/support");
+                break;
+            case "order-shipped":
+                data.put("email_greeting", "It's on the way! 🚚");
+                data.put("email_title", "Your order has been shipped");
+                data.put("email_body", emailBody);
+                data.put("button_text", "TRACK YOUR ORDER 📍");
+                data.put("button_url", "https://t-commerce.com/orders/{{order_id}}");
+                break;
+            case "order-delivered":
+                data.put("email_greeting", "Success! 🎉");
+                data.put("email_title", "Your order has been delivered");
+                data.put("email_body", emailBody);
+                data.put("button_text", "VIEW ORDER 📦");
+                data.put("button_url", "https://t-commerce.com/orders/{{order_id}}");
                 break;
 
             default:

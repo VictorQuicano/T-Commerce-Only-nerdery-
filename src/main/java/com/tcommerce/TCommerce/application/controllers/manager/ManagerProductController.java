@@ -5,9 +5,9 @@ import com.tcommerce.TCommerce.application.services.commerce.ProductService;
 import com.tcommerce.TCommerce.domain.entities.commerce.Product;
 import com.tcommerce.TCommerce.interfaces.dto.commerce.product.CreateProductRequest;
 import com.tcommerce.TCommerce.interfaces.dto.commerce.product.ProductFullResponse;
+import com.tcommerce.TCommerce.interfaces.dto.commerce.product.ProductPriceHistoryResponse;
 import com.tcommerce.TCommerce.interfaces.dto.commerce.product.UpdateProductRequest;
 
-import com.tcommerce.TCommerce.domain.entities.commerce.ProductImage;
 import jakarta.validation.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -106,5 +106,14 @@ public class ManagerProductController extends PageProcessor {
     public ResponseEntity<Void> deleteProduct(@PathVariable String id) {
         productService.deleteProduct(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/price-history")
+    public ResponseEntity<List<ProductPriceHistoryResponse>> getProductPriceHistory(@PathVariable String id) {
+        List<com.tcommerce.TCommerce.domain.entities.commerce.ProductPriceHistory> history = productService.getPriceHistory(id);
+        List<ProductPriceHistoryResponse> response = history.stream()
+                .map(h -> new ProductPriceHistoryResponse(h.getId(), h.getPrice(), h.getCreatedAt()))
+                .toList();
+        return ResponseEntity.ok(response);
     }
 }

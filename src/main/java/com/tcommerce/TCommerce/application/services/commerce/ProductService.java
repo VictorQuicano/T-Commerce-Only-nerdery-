@@ -13,7 +13,9 @@ import com.tcommerce.TCommerce.domain.entities.commerce.Category;
 import com.tcommerce.TCommerce.interfaces.dto.commerce.product.CreateProductRequest;
 import com.tcommerce.TCommerce.interfaces.dto.commerce.product.UpdateProductRequest;
 import com.tcommerce.TCommerce.domain.repositories.interfaces.auth.UserRepository;
+import com.tcommerce.TCommerce.domain.repositories.interfaces.commerce.ProductPriceHistoryRepository;
 import com.tcommerce.TCommerce.domain.entities.auth.User;
+import com.tcommerce.TCommerce.domain.entities.commerce.ProductPriceHistory;
 
 import lombok.RequiredArgsConstructor;
 
@@ -40,6 +42,7 @@ public class ProductService {
     private final ProductImageService productImageService;
     private final StockUpdater stockUpdater;
     private final StockAlertService stockAlertService;
+    private final ProductPriceHistoryRepository priceHistoryRepository;
 
     public Window<Product> getAllProducts(ProductFilter filter, ScrollPosition position, int limit, Sort sort) {
         return productRepository.findAll(position, limit, filter, sort);
@@ -52,6 +55,10 @@ public class ProductService {
 
     public List<Product> getProductsByName(String name) {
         return productRepository.findByNameContaining(name);
+    }
+
+    public List<ProductPriceHistory> getPriceHistory(String productId) {
+        return priceHistoryRepository.findByProductId(productId);
     }
 
     @Transactional
@@ -82,13 +89,21 @@ public class ProductService {
                 .updatedAt(now)
                 .build();
 
-        return productRepository.save(product);
+        Product savedProduct = productRepository.save(product);
+        
+        priceHistoryRepository.save(ProductPriceHistory.builder()
+                .productId(savedProduct.getId())
+                .price(savedProduct.getPrice())
+                .build());
+
+        return savedProduct;
     }
 
     @Transactional
     public Product updateProduct(String id, UpdateProductRequest request) {
         Product product = getProductById(id);
         LocalDateTime now = LocalDateTime.now();
+        BigInteger oldPrice = product.getPrice();
 
         if (request.name() != null && !request.name().equals(product.getName())) {
             if (productRepository.existsByName(request.name())) {
@@ -121,7 +136,16 @@ public class ProductService {
         }
 
         product.setUpdatedAt(now);
-        return productRepository.save(product);
+        Product savedProduct = productRepository.save(product);
+
+        if (request.price() != null && !request.price().equals(oldPrice)) {
+            priceHistoryRepository.save(ProductPriceHistory.builder()
+                    .productId(savedProduct.getId())
+                    .price(savedProduct.getPrice())
+                    .build());
+        }
+
+        return savedProduct;
     }
 
     public Product reduceStock(Product product, BigInteger quantity) {
