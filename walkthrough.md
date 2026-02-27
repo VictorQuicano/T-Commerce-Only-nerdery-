@@ -72,9 +72,9 @@
 | Template-based emails | ✅ Done    | SendGrid dynamic templates and Resend HTML body generation |
 | Password reset email | ✅ Done    | Triggered in `PasswordResetServiceImpl` |
 | Password change confirmation email | ✅ Done    | Triggered after successful password reset |
-| Order status updates email | ❌ Missing | `OrderService.updateOrderStatus()` does **not** publish an `EmailEvent` yet |
-| Low stock alerts (liked products) | ✅ Done    | Requirement: stock < 3 units for liked items |
-| Discount alerts (liked products) | ✅ Done    | No listener for price changes |
+| Order status updates email | ✅ Done    | `OrderService` uses `ChangeStatusNotificationService` to notify status changes. |
+| Low stock alerts (liked products) | ✅ Done    | `StockNotificationService` notifies users who liked a product when stock is low. |
+| Discount alerts (liked products) | ❌ Missing | No listener for price changes yet. |
 
 ---
 
@@ -89,7 +89,7 @@
 | Upload product images | ✅ Done | `POST /manager/products/{id}/images` (GCP Storage) |
 | View client orders with pagination | ✅ Done | `GET /manager/orders` (REST) and `managerOrders` (GraphQL) with cursor pagination |
 | Update delivery status | ✅ Done | `updateDeliveryStatus` in GraphQL mutation; validates role |
-| Price change logging | ❌ Missing | No logic to log product price history |
+| Price change logging | ✅ Done | `ProductService` logs price changes in `ProductPriceHistoryRepository`. |
 | Prevent deletion if product has pending orders |  ✅ Done    | `deleteProduct()` needs to check for active orders |
 
 ---
@@ -153,9 +153,18 @@
 | Priority | Item | Impact |
 |---|---|---|
 | 🔴 HIGH | **Stock decrement on order creation** | Data integrity/overselling risk |
-| 🟠 MED | **Email: Order status change notification** | Core UX requirement |
-| 🟠 MED | **Email: Low stock alert for liked products** | Marketing/Engagement requirement |
 | 🟠 MED | **Email: Discount alert for liked products** | Marketing/Engagement requirement |
 | 🟡 LOW | **Startup env variable validation** | `@Validated` in `@ConfigurationProperties` |
 | 🟡 LOW | **Prevent product deletion with active orders** | Referential integrity |
-| 🟡 LOW | **Price change logging** | Audit requirement |
+
+---
+
+## 🌟 Optional Features
+
+| Feature | Status | Notes |
+|---|---|---|
+| **Refund & Return System** | ⚠️ Partial | Core `Refund` entity, Stripe integration, and cancellation logic implemented. |
+| **Auction System** | ❌ Missing | Not started. |
+| **Recommendation System** | ❌ Missing | Not started. |
+| **Deployment** | ✅ Done | Configured for Google Cloud Run via `cloudbuild.yaml`. |
+| **API Documentation** | ✅ Done | Full OpenAPI/Swagger documentation with JWT security configuration. |

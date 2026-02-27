@@ -21,6 +21,7 @@ import com.tcommerce.TCommerce.domain.entities.auth.User;
 import com.tcommerce.TCommerce.infrastructure.persistence.entities.auth.ERole;
 import java.util.UUID;  
 import java.util.ArrayList;
+import com.tcommerce.TCommerce.application.services.auth.WelcomeNotificationService;
 
 
 @Service
@@ -31,6 +32,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
     private final RefreshTokenService refreshTokenService;
+    private final WelcomeNotificationService welcomeNotificationService;
     
     @Override
     public AuthResponse authenticate(LoginRequest request){
@@ -65,6 +67,7 @@ public class AuthServiceImpl implements AuthService {
                 .role(ERole.CLIENT)
                 .build();
         user = userRepository.save(user);
+        welcomeNotificationService.notifyUser(user.getEmail(), user.getFirstName(), user.getLastName());
         UserDetails userDetails = new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), new ArrayList<>());
         var jwt = jwtService.generateToken(userDetails);
         var refreshToken = refreshTokenService.createRefreshToken(user.getId());
