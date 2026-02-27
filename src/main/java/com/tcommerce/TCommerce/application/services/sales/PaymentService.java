@@ -49,6 +49,7 @@ public class PaymentService {
         if (order.getStatus() != OrderStatus.PENDING && order.getStatus() != OrderStatus.PAYMENT_FAILED) {
             throw new RuntimeException("Order is not in a valid state for checkout. Current status: " + order.getStatus());
         }
+        order = shippingService.reserveStock(order);
 
         // Calculate total from order items
         BigInteger totalAmount = order.getItems().stream()

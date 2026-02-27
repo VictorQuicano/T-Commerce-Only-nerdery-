@@ -148,6 +148,11 @@ public class ProductService {
         return savedProduct;
     }
 
+    public Product increaseStock(Product product, BigInteger quantity) {
+        BigInteger newStock = product.getStock().getQuantity().add(quantity);
+        return updateStock(product, newStock);
+    }
+
     public Product reduceStock(Product product, BigInteger quantity) {
         BigInteger newStock = product.getStock().getQuantity().subtract(quantity);
         return updateStock(product, newStock);

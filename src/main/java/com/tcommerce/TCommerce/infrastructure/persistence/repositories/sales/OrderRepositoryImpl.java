@@ -14,6 +14,8 @@ import org.springframework.data.domain.Window;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDateTime;
+import com.tcommerce.TCommerce.domain.entities.sales.OrderStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,9 +67,6 @@ public class OrderRepositoryImpl implements OrderRepository {
     @Override
     @Transactional
     public Order save(Order order) {
-        // For existing orders: fetch the managed entity and update fields in-place.
-        // This avoids ObjectOptimisticLockingFailureException caused by merging
-        // a manually-constructed detached entity with cascaded children.
         if (order.getId() != null) {
             Optional<OrderEntity> existing = jpaOrderRepository.findById(order.getId());
             if (existing.isPresent()) {
@@ -76,24 +75,26 @@ public class OrderRepositoryImpl implements OrderRepository {
                 entity.setPaymentIntentId(order.getPaymentIntentId());
                 entity.setUpdatedAt(order.getUpdatedAt());
 
-                // Append any new status history entries (identified by null id)
                 List<OrderStatusHistoryEntity> newHistoryEntries = order.getStatusHistory().stream()
                         .filter(h -> h.getId() == null)
                         .map(h -> orderMapper.toEntity(h, entity))
                         .collect(Collectors.toList());
                 entity.getStatusHistory().addAll(newHistoryEntries);
 
-                // JPA dirty-checks automatically — no explicit save() needed,
-                // but we call it here to ensure flush within the same transaction.
                 OrderEntity savedEntity = jpaOrderRepository.save(entity);
                 return orderMapper.toDomain(savedEntity);
             }
         }
 
-        // New order: use the full mapper path
         OrderEntity entity = orderMapper.toEntity(order);
         OrderEntity savedEntity = jpaOrderRepository.save(entity);
         return orderMapper.toDomain(savedEntity);
+    }
+    @Override
+    public List<Order> findByStatusAndUpdatedAtBefore(OrderStatus status, LocalDateTime dateTime) {
+        return jpaOrderRepository.findByStatusAndUpdatedAtBefore(status, dateTime).stream()
+                .map(orderMapper::toDomain)
+                .collect(Collectors.toList());
     }
 }
 

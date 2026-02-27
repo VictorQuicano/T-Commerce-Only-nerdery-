@@ -1,32 +1,37 @@
 package com.tcommerce.TCommerce.application.services.sales;
 
 import com.tcommerce.TCommerce.application.query.OrderFilter;
+import com.tcommerce.TCommerce.domain.entities.commerce.Product;
 import com.tcommerce.TCommerce.domain.entities.sales.*;
 import com.tcommerce.TCommerce.domain.repositories.interfaces.sales.OrderRepository;
 import com.tcommerce.TCommerce.domain.exceptions.CartEmptyException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.data.domain.ScrollPosition;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Window;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
-import org.springframework.http.HttpStatus;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import com.tcommerce.TCommerce.application.services.commerce.ProductService;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class OrderService {
 
     private final OrderRepository orderRepository;
     private final CartService cartService;
     private final ChangeStatusNotificationService changeStatusNotificationService; 
+    private final ProductService productService;
 
     public Window<Order> getAllOrders(OrderFilter filter, ScrollPosition position, int limit, Sort sort) {
         return orderRepository.findAll(position, limit, filter, sort);
@@ -89,6 +94,8 @@ public class OrderService {
                 .orElseThrow(() -> new RuntimeException("Order not found with id: " + orderId));
     }
 
+
+
     public Order updateOrderStatus(String orderId, OrderStatus nextStatus, String userId, String reason) {
         Order order = getOrderById(orderId);
         OrderStatus currentStatus = order.getStatus();        
@@ -111,8 +118,9 @@ public class OrderService {
         changeStatusNotificationService.notifyStatusChange(savedOrder.getId(), currentStatus, nextStatus, userId, reason);
         return savedOrder;
     }
-
+    
     public Order cancelOrder(Order order, String userId, String reason) {
+        
         OrderStatus currentStatus = order.getStatus();
 
         OrderStatusHistory history = OrderStatusHistory.builder()
@@ -120,7 +128,7 @@ public class OrderService {
                 .fromStatus(currentStatus)
                 .toStatus(OrderStatus.CANCELLED)
                 .changedAt(LocalDateTime.now())
-                .changedBy(userId)
+                .changedBy("SYSTEM".equals(userId) ? null : userId)
                 .reason(reason)
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -128,11 +136,28 @@ public class OrderService {
         order.setStatus(OrderStatus.CANCELLED);
         order.setUpdatedAt(LocalDateTime.now());
         order.getStatusHistory().add(history);
+        order = restockOrder(order);
 
         Order savedOrder = orderRepository.save(order);
         changeStatusNotificationService.notifyStatusChange(savedOrder.getId(), currentStatus, OrderStatus.CANCELLED, userId, reason);
         return savedOrder;
     }
+
+    public Order restockOrder(Order order){
+        order.getItems().forEach(item -> {
+            try {
+                Product product = productService.getProductById(item.getProductId());
+                productService.increaseStock(product, BigInteger.valueOf(item.getQuantity()));
+            } catch (Exception e) {
+                log.error("Failed to return stock for product {} in order {}: {}", 
+                    item.getProductId(), order.getId(), e.getMessage());
+            }
+        });
+
+        return orderRepository.save(order);
+    
+    }
+
 
     public Order initiatePayment(String orderId, String paymentIntentId, String userId) {
         Order order = getOrderById(orderId);
@@ -158,5 +183,9 @@ public class OrderService {
         changeStatusNotificationService.notifyStatusChange(savedOrder.getId(), currentStatus, OrderStatus.AWAITING_PAYMENT, userId, "Payment initiated");
         return savedOrder;
     }
+    public Order save(Order order) {
+        return orderRepository.save(order);
+    }
+
 }
 
