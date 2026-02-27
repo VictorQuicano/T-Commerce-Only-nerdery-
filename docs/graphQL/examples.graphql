@@ -1,6 +1,4 @@
-# ===== Expresión de Queries de Ejemplo =====
 
-# Obtener mis órdenes con paginación (Estilo Relay)
 query GetMyOrders($first: Int, $after: String) {
   myOrders(first: $first, after: $after) {
     edges {
@@ -30,7 +28,6 @@ query GetMyOrders($first: Int, $after: String) {
   }
 }
 
-# Obtener órdenes para el Manager con filtro opcional de estado
 query GetManagerOrders($first: Int, $after: String, $status: OrderStatus) {
   managerOrders(first: $first, after: $after, status: $status) {
     edges {
@@ -56,11 +53,6 @@ query GetManagerOrders($first: Int, $after: String, $status: OrderStatus) {
   }
 }
 
-# ===== Expresión de Mutations de Ejemplo =====
-
-# --- Gestión del Carrito ---
-
-# Agregar un producto al carrito
 mutation AddToCart($productId: ID!, $quantity: Int!) {
   addToCart(productId: $productId, quantity: $quantity) {
     id
@@ -76,7 +68,6 @@ mutation AddToCart($productId: ID!, $quantity: Int!) {
   }
 }
 
-# Remover un producto del carrito
 mutation RemoveFromCart($productId: ID!) {
   removeFromCart(productId: $productId) {
     id
@@ -90,7 +81,6 @@ mutation RemoveFromCart($productId: ID!) {
   }
 }
 
-# Vaciar el carrito
 mutation ClearCart {
   clearCart {
     id
@@ -103,9 +93,6 @@ mutation ClearCart {
   }
 }
 
-# --- Gestión de Órdenes ---
-
-# Crear una orden a partir del contenido del carrito actual
 mutation CreateOrder {
   createOrderFromCart {
     id
@@ -120,7 +107,6 @@ mutation CreateOrder {
   }
 }
 
-# Actualizar el estado de entrega de una orden (Solo Manager)
 mutation UpdateDeliveryStatus($orderId: ID!, $status: OrderStatus!) {
   updateDeliveryStatus(orderId: $orderId, status: $status) {
     id
@@ -129,9 +115,6 @@ mutation UpdateDeliveryStatus($orderId: ID!, $status: OrderStatus!) {
   }
 }
 
-# --- Gestión de Productos (Solo Manager) ---
-
-# Deshabilitar un producto
 mutation DisableProduct($productId: ID!) {
   disableProduct(productId: $productId) {
     id
@@ -139,15 +122,10 @@ mutation DisableProduct($productId: ID!) {
     disabled
   }
 }
-
-# Eliminar un producto
 mutation DeleteProduct($productId: ID!) {
   deleteProduct(productId: $productId)
 }
 
-# --- Otras Acciones ---
-
-# Dar/Quitar "like" a un producto
 mutation ToggleLike($productId: ID!) {
   toggleLike(productId: $productId)
 }

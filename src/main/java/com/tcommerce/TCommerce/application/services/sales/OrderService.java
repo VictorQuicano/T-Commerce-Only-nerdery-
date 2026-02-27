@@ -3,12 +3,15 @@ package com.tcommerce.TCommerce.application.services.sales;
 import com.tcommerce.TCommerce.application.query.OrderFilter;
 import com.tcommerce.TCommerce.domain.entities.sales.*;
 import com.tcommerce.TCommerce.domain.repositories.interfaces.sales.OrderRepository;
+import com.tcommerce.TCommerce.domain.exceptions.CartEmptyException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.ScrollPosition;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Window;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -32,7 +35,9 @@ public class OrderService {
     public Order createOrderFromCart(String userId) {
         Cart cart = cartService.getOrCreateCart(userId);
         if (cart.getItems().isEmpty()) {
-            throw new RuntimeException("Cannot create order from an empty cart");
+            throw new CartEmptyException(
+                "Cannot create order from an empty cart"
+            );
         }
 
         LocalDateTime now = LocalDateTime.now();
