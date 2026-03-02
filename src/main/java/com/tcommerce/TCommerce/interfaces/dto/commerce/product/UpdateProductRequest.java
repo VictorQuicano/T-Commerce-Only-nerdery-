@@ -13,7 +13,7 @@ public record UpdateProductRequest(
         @Min(value = 0, message = "Price must be greater than or equal to 0")
         BigInteger price,
 
-        boolean isActive,
+        Boolean isActive,
 
         String categoryId,
 
