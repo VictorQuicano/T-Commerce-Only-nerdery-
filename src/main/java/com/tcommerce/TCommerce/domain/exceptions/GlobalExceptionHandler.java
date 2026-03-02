@@ -1,6 +1,7 @@
 package com.tcommerce.TCommerce.domain.exceptions;
 
 
+import org.springframework.graphql.data.method.annotation.GraphQlExceptionHandler;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.validation.FieldError;
@@ -12,6 +13,10 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.context.request.WebRequest;
 
 import com.stripe.exception.StripeException;
+
+import graphql.ErrorType;
+import graphql.GraphQLError;
+import graphql.GraphqlErrorBuilder;
 
 import java.net.URI;
 import java.time.LocalDateTime;
@@ -136,6 +141,14 @@ public class GlobalExceptionHandler {
         problemDetail.setProperty("path", request.getDescription(false).replace("uri=", ""));
 
         return problemDetail;
+    }
+
+    @GraphQlExceptionHandler
+    public GraphQLError handleCartEmpty(CartEmptyException ex) {
+        return GraphqlErrorBuilder.newError()
+                .message(ex.getMessage())
+                .errorType(ErrorType.ValidationError)
+                .build();
     }
 
 }

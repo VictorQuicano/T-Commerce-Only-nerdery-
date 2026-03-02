@@ -26,25 +26,28 @@ public class ShippingService {
     private final StockNotificationService stockNotificationService;
     private final OrderService orderService;
 
-    public void startShipping(Order order) {
+    public Order reserveStock(Order order) {
         String userId = order.getUserId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        order.getItems().stream().forEach(item -> {
-            checkStock(item, user);
-        });
-        order = orderService.updateOrderStatus(order.getId(), OrderStatus.SHIPPED, "SYSTEM", "Order shipped");
+        order.getItems().removeIf(item -> !checkStock(item, user));
+        return orderService.save(order);
     }
 
-    private void checkStock(OrderItem order, User user) {
+    public void startShipping(Order order) {
+        orderService.updateOrderStatus(order.getId(), OrderStatus.SHIPPED, "SYSTEM", "Order shipped");
+    }
+
+    private boolean checkStock(OrderItem order, User user) {
         Product product = productService.getProductById(order.getProductId());
         if(product == null ){
-            return;
+            return false;
         }
         if (!productService.hasEnoughStock(product, BigInteger.valueOf(order.getQuantity()))){
             stockNotificationService.notifyUserNotEnoughStock(product, user);
-            return;
+            return false;
         }
         productService.reduceStock(product, BigInteger.valueOf(order.getQuantity()));
+        return true;
     }
 }
