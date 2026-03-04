@@ -1,0 +1,199 @@
+package com.tcommerce.TCommerce.domain.handlers;
+
+
+import org.springframework.graphql.data.method.annotation.GraphQlExceptionHandler;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.context.request.WebRequest;
+
+import com.stripe.exception.StripeException;
+import com.tcommerce.TCommerce.domain.exceptions.AlreadyExistsException;
+import com.tcommerce.TCommerce.domain.exceptions.CartEmptyException;
+import com.tcommerce.TCommerce.domain.exceptions.CrudException;
+import com.tcommerce.TCommerce.domain.exceptions.NotEnoughStock;
+
+import graphql.ErrorType;
+import graphql.GraphQLError;
+import graphql.GraphqlErrorBuilder;
+
+import java.net.URI;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ProblemDetail handleValidationExceptions(MethodArgumentNotValidException ex, WebRequest request) {
+        Map<String, String> errors = new HashMap<>();
+        
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST,
+                "Validation failed"
+        );
+
+        problemDetail.setTitle("Validation Error");
+        problemDetail.setType(URI.create("validation-error"));
+        problemDetail.setProperty("timestamp", LocalDateTime.now());
+        problemDetail.setProperty("path", request.getDescription(false).replace("uri=", ""));
+        problemDetail.setProperty("errors", errors);
+
+        return problemDetail;
+    }
+
+    @ExceptionHandler(org.springframework.web.method.annotation.HandlerMethodValidationException.class)
+    public ProblemDetail handleMethodValidationException(org.springframework.web.method.annotation.HandlerMethodValidationException ex, WebRequest request) {
+        Map<String, String> errors = new HashMap<>();
+        
+        ex.getAllValidationResults().forEach(result -> {
+            String name = result.getMethodParameter().getParameterName();
+            result.getResolvableErrors().forEach(error -> {
+                errors.put(name, error.getDefaultMessage());
+            });
+        });
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST,
+                "Validation failed for method parameters"
+        );
+
+        problemDetail.setTitle("Validation Error");
+        problemDetail.setType(URI.create("validation-error"));
+        problemDetail.setProperty("timestamp", LocalDateTime.now());
+        problemDetail.setProperty("path", request.getDescription(false).replace("uri=", ""));
+        problemDetail.setProperty("errors", errors);
+
+        return problemDetail;
+    }
+
+    @ExceptionHandler(CrudException.class)
+    public ProblemDetail handleCrudException(CrudException ex, WebRequest request) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                ex.getHttpStatus(),
+                ex.getMessage()
+        );
+
+        problemDetail.setTitle("Operation Error");
+        problemDetail.setType(URI.create("operation-error"));
+        problemDetail.setProperty("errorCode", ex.getErrorCode());
+        problemDetail.setProperty("timestamp", ex.getTimestamp());
+        problemDetail.setProperty("path", request.getDescription(false).replace("uri=", ""));
+
+        return problemDetail;
+    }
+
+    @ExceptionHandler(AlreadyExistsException.class)
+    public ProblemDetail handleAlreadyExists(AlreadyExistsException ex, WebRequest request) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                ex.getHttpStatus(),
+                ex.getMessage()
+        );
+
+        problemDetail.setTitle("Resource already exists");
+        problemDetail.setType(URI.create("resource-already-exists"));
+        problemDetail.setProperty("errorCode", ex.getErrorCode());
+        problemDetail.setProperty("timestamp", ex.getTimestamp());
+        problemDetail.setProperty("path", request.getDescription(false).replace("uri=", ""));
+
+        return problemDetail;
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ProblemDetail handleAccessDeniedException(AccessDeniedException ex, WebRequest request) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.FORBIDDEN,
+                "Access denied: You do not have permission to access this resource"
+        );
+        problemDetail.setTitle("Forbidden");
+        problemDetail.setType(URI.create("forbidden"));
+        problemDetail.setProperty("timestamp", LocalDateTime.now());
+        problemDetail.setProperty("path", request.getDescription(false).replace("uri=", ""));
+
+        return problemDetail;
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ProblemDetail handleAuthenticationException(AuthenticationException ex, WebRequest request) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.UNAUTHORIZED,
+                ex.getMessage()
+        );
+
+        problemDetail.setTitle("Unauthorized");
+        problemDetail.setType(URI.create("unauthorized"));
+        problemDetail.setProperty("timestamp", LocalDateTime.now());
+        problemDetail.setProperty("path", request.getDescription(false).replace("uri=", ""));
+
+        return problemDetail;
+    }
+
+    @ExceptionHandler(StripeException.class)
+    public ProblemDetail handleStripeException(StripeException ex, WebRequest request) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_GATEWAY,
+                "Payment processing error: " + ex.getMessage()
+        );
+
+        problemDetail.setTitle("Payment Error");
+        problemDetail.setType(URI.create("payment-error"));
+        problemDetail.setProperty("stripeCode", ex.getCode());
+        problemDetail.setProperty("timestamp", LocalDateTime.now());
+        problemDetail.setProperty("path", request.getDescription(false).replace("uri=", ""));
+
+        return problemDetail;
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ProblemDetail handleGenericException(Exception ex, WebRequest request) {
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                ex.getMessage() != null ? ex.getMessage() : "Unexpected error"
+        );
+
+        problemDetail.setTitle(ex.getClass().getSimpleName());
+        problemDetail.setType(URI.create("internal-server-error"));
+        problemDetail.setProperty("timestamp", LocalDateTime.now());
+        problemDetail.setProperty("path", request.getDescription(false).replace("uri=", ""));
+
+        return problemDetail;
+    }
+
+    @ExceptionHandler(NotEnoughStock.class)
+    public ProblemDetail handleNotEnoughStock(NotEnoughStock ex, WebRequest request) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST,
+                "Not enough stock for product: " + ex.getMessage()
+        );
+
+        problemDetail.setTitle("Not enough stock");
+        problemDetail.setType(URI.create("not-enough-stock"));
+        problemDetail.setProperty("timestamp", LocalDateTime.now());
+        problemDetail.setProperty("path", request.getDescription(false).replace("uri=", ""));
+
+        return problemDetail;
+    }
+
+    @GraphQlExceptionHandler
+    public GraphQLError handleCartEmpty(CartEmptyException ex) {
+        return GraphqlErrorBuilder.newError()
+                .message(ex.getMessage())
+                .errorType(ErrorType.ValidationError)
+                .build();
+    }
+
+
+}
