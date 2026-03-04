@@ -13,7 +13,7 @@ import com.tcommerce.TCommerce.interfaces.validation.validators.ExistEmailValida
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = ExistEmailValidator.class)
 public @interface ExistEmail {
-    String message() default "Email does not exist";
+    String message() default "Email already exists";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

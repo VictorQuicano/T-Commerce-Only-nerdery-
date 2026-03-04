@@ -14,6 +14,7 @@ import com.tcommerce.TCommerce.interfaces.dto.commerce.product.CreateProductRequ
 import com.tcommerce.TCommerce.interfaces.dto.commerce.product.ProductFullResponse;
 import com.tcommerce.TCommerce.interfaces.dto.commerce.product.ProductPriceHistoryResponse;
 import com.tcommerce.TCommerce.interfaces.dto.commerce.product.UpdateProductRequest;
+import com.tcommerce.TCommerce.interfaces.validation.annotations.ValidImageList;
 
 import jakarta.validation.*;
 import org.springframework.web.bind.annotation.*;
@@ -60,7 +61,8 @@ public class ManagerProductController extends PageProcessor {
             request.name(), 
             request.categoryId(), 
             request.isActive(), 
-            request.isDeleted()
+            request.isDeleted(),
+            null
         );
         
         PaginationCriteria criteria = processRequest(request);
@@ -132,7 +134,10 @@ public class ManagerProductController extends PageProcessor {
     @PostMapping(value = "/{id}/images", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProductFullResponse> addImages(
             @Parameter(description = "The unique identifier of the product") @PathVariable String id,
-            @Parameter(description = "The image files to upload") @RequestParam("images") List<MultipartFile> images) {
+            @Parameter(description = "The image files to upload") 
+            @RequestParam("images") 
+            @ValidImageList
+            List<MultipartFile> images) {
         Product product = productService.addProductImages(id, images);
         return ResponseEntity.ok(product.toFullResponse());
     }

@@ -11,4 +11,5 @@ public interface ProductImageRepository extends CRUDRepository<ProductImage> {
     Optional<ProductImage> findByImageUrl(String imageUrl);
     int countByProductId(String productId);
     void delete(ProductImage image);
+    List<ProductImage> saveAll(List<ProductImage> images);
 }

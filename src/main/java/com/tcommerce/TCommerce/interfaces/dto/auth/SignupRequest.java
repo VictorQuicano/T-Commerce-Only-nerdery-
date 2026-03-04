@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import com.tcommerce.TCommerce.interfaces.validation.annotations.ExistEmail;
 import com.tcommerce.TCommerce.interfaces.validation.annotations.StrongPassword;
 
 @Getter
@@ -28,6 +30,7 @@ public class SignupRequest {
     @NotBlank(message = "Email is required")
     @Size(max = 100)
     @Email
+    @ExistEmail
     private String email;
 
     @NotBlank(message = "Password is required")

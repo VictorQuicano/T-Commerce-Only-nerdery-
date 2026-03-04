@@ -20,6 +20,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Window;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import com.tcommerce.TCommerce.infrastructure.security.services.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -39,9 +41,14 @@ public class ProductController extends PageProcessor {
     )
     @GetMapping
     public ResponseEntity<Window<ProductListResponse>> getAllProducts(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
             @Parameter(description = "Pagination and filter parameters") ProductPaginationRequest request) {
             
-        ProductFilter filter = new ProductFilter(request.name(), request.categoryId(), true, false);
+        String likedByUserId = (request.onlyLiked() != null && request.onlyLiked() && userDetails != null) 
+                ? userDetails.getId() 
+                : null;
+
+        ProductFilter filter = new ProductFilter(request.name(), request.categoryId(), true, false, likedByUserId);
         
         PaginationCriteria criteria = processRequest(request);
 

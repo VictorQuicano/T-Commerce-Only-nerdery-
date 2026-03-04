@@ -19,6 +19,7 @@ public class EmailEvent extends ApplicationEvent {
     private final String subject;
     private final Map<String, Object> dynamicBody;
     private final DeliveryChannel channel;
+    private final String userId;
 
     public enum DeliveryChannel {
         SMTP,
@@ -29,15 +30,20 @@ public class EmailEvent extends ApplicationEvent {
     }
 
     public EmailEvent(Object source, String to, String subject, Map<String, Object> dynamicBody) {
-        this(source, to, subject, dynamicBody, DeliveryChannel.AUTO);
+        this(source, to, subject, dynamicBody, DeliveryChannel.AUTO, null);
     }
 
     public EmailEvent(Object source, String to, String subject, Map<String, Object> dynamicBody, DeliveryChannel channel) {
+        this(source, to, subject, dynamicBody, channel, null);
+    }
+
+    public EmailEvent(Object source, String to, String subject, Map<String, Object> dynamicBody, DeliveryChannel channel, String userId) {
         super(source);
         this.to             = to;
         this.subject        = subject;
         this.dynamicBody    = dynamicBody;
         this.channel        = channel;
+        this.userId         = userId;
     }
 }
 

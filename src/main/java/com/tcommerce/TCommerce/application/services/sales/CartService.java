@@ -4,6 +4,7 @@ import com.tcommerce.TCommerce.application.services.commerce.ProductService;
 import com.tcommerce.TCommerce.domain.entities.commerce.Product;
 import com.tcommerce.TCommerce.domain.entities.sales.Cart;
 import com.tcommerce.TCommerce.domain.entities.sales.CartItem;
+import com.tcommerce.TCommerce.domain.exceptions.NotEnoughStock;
 import com.tcommerce.TCommerce.domain.repositories.interfaces.sales.CartRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -52,7 +53,7 @@ public class CartService {
         BigInteger availableStock = product.getStock().getQuantity();
 
         if (availableStock.compareTo(BigInteger.valueOf(newQuantity)) < 0) {
-            throw new IllegalStateException("Not enough stock");
+            throw new NotEnoughStock(product.getName()+"only has " + availableStock + " stock");
         }
 
         if (existingItem != null) {

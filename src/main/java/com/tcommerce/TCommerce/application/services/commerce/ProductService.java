@@ -85,6 +85,7 @@ public class ProductService {
                 .category(category)
                 .stock(stock)
                 .images(new ArrayList<>())
+                .isActive(true)
                 .createdAt(now)
                 .updatedAt(now)
                 .build();
@@ -133,6 +134,10 @@ public class ProductService {
             } else {
                  product.setStock(new Stock(UUID.randomUUID().toString(), request.stockQuantity(), now, now));
             }
+        }
+
+        if (request.isActive() != null) {
+            product.setActive(request.isActive());
         }
 
         product.setUpdatedAt(now);
