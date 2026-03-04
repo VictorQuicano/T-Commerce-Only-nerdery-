@@ -23,6 +23,7 @@ import com.tcommerce.TCommerce.domain.entities.commerce.Product;
 import com.tcommerce.TCommerce.domain.entities.commerce.Stock;
 import com.tcommerce.TCommerce.domain.entities.sales.Cart;
 import com.tcommerce.TCommerce.domain.entities.sales.CartItem;
+import com.tcommerce.TCommerce.domain.exceptions.NotEnoughStock;
 import com.tcommerce.TCommerce.domain.repositories.interfaces.sales.CartRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -88,8 +89,8 @@ class CartServiceTest {
 
         
         assertThatThrownBy(() -> cartService.addItemToCart(userId, "prod-id", 11))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Not enough stock");
+                .isInstanceOf(NotEnoughStock.class)
+                .hasMessage("Test Product only has 10 stock");
     }
 
     @Test

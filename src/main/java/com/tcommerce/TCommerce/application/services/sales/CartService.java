@@ -53,7 +53,7 @@ public class CartService {
         BigInteger availableStock = product.getStock().getQuantity();
 
         if (availableStock.compareTo(BigInteger.valueOf(newQuantity)) < 0) {
-            throw new NotEnoughStock(product.getName()+"only has " + availableStock + " stock");
+            throw new NotEnoughStock(product.getName()+" only has " + availableStock + " stock");
         }
 
         if (existingItem != null) {
