@@ -6,6 +6,7 @@ import com.tcommerce.TCommerce.domain.repositories.interfaces.commerce.ProductRe
 import com.tcommerce.TCommerce.infrastructure.persistence.entities.commerce.ProductEntity;
 import com.tcommerce.TCommerce.infrastructure.persistence.mappers.commerce.ProductMapper;
 import com.tcommerce.TCommerce.infrastructure.persistence.repositories.commerce.JpaProductRepository;
+import com.tcommerce.TCommerce.infrastructure.persistence.entities.commerce.ProductLikeEntity;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.domain.ScrollPosition;
 import org.springframework.data.domain.Sort;
@@ -59,6 +60,13 @@ public class ProductRepositoryImpl implements ProductRepository {
                     } else {
                         predicates.add(cb.isNull(root.get("deletedAt")));
                     }
+                }
+                if (filter.likedByUserId() != null && !filter.likedByUserId().isEmpty()) {
+                    jakarta.persistence.criteria.Subquery<String> subquery = query.subquery(String.class);
+                    jakarta.persistence.criteria.Root<ProductLikeEntity> likeRoot = subquery.from(ProductLikeEntity.class);
+                    subquery.select(likeRoot.get("product").get("id"))
+                        .where(cb.equal(likeRoot.get("user").get("id"), filter.likedByUserId()));
+                    predicates.add(root.get("id").in(subquery));
                 }
             }
             return cb.and(predicates.toArray(new Predicate[0]));

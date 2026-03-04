@@ -1,4 +1,4 @@
-package com.tcommerce.TCommerce.domain.exceptions;
+package com.tcommerce.TCommerce.domain.handlers;
 
 
 import org.springframework.graphql.data.method.annotation.GraphQlExceptionHandler;
@@ -13,6 +13,10 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.context.request.WebRequest;
 
 import com.stripe.exception.StripeException;
+import com.tcommerce.TCommerce.domain.exceptions.AlreadyExistsException;
+import com.tcommerce.TCommerce.domain.exceptions.CartEmptyException;
+import com.tcommerce.TCommerce.domain.exceptions.CrudException;
+import com.tcommerce.TCommerce.domain.exceptions.NotEnoughStock;
 
 import graphql.ErrorType;
 import graphql.GraphQLError;
@@ -39,6 +43,31 @@ public class GlobalExceptionHandler {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.BAD_REQUEST,
                 "Validation failed"
+        );
+
+        problemDetail.setTitle("Validation Error");
+        problemDetail.setType(URI.create("validation-error"));
+        problemDetail.setProperty("timestamp", LocalDateTime.now());
+        problemDetail.setProperty("path", request.getDescription(false).replace("uri=", ""));
+        problemDetail.setProperty("errors", errors);
+
+        return problemDetail;
+    }
+
+    @ExceptionHandler(org.springframework.web.method.annotation.HandlerMethodValidationException.class)
+    public ProblemDetail handleMethodValidationException(org.springframework.web.method.annotation.HandlerMethodValidationException ex, WebRequest request) {
+        Map<String, String> errors = new HashMap<>();
+        
+        ex.getAllValidationResults().forEach(result -> {
+            String name = result.getMethodParameter().getParameterName();
+            result.getResolvableErrors().forEach(error -> {
+                errors.put(name, error.getDefaultMessage());
+            });
+        });
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST,
+                "Validation failed for method parameters"
         );
 
         problemDetail.setTitle("Validation Error");
@@ -143,6 +172,21 @@ public class GlobalExceptionHandler {
         return problemDetail;
     }
 
+    @ExceptionHandler(NotEnoughStock.class)
+    public ProblemDetail handleNotEnoughStock(NotEnoughStock ex, WebRequest request) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST,
+                "Not enough stock for product: " + ex.getMessage()
+        );
+
+        problemDetail.setTitle("Not enough stock");
+        problemDetail.setType(URI.create("not-enough-stock"));
+        problemDetail.setProperty("timestamp", LocalDateTime.now());
+        problemDetail.setProperty("path", request.getDescription(false).replace("uri=", ""));
+
+        return problemDetail;
+    }
+
     @GraphQlExceptionHandler
     public GraphQLError handleCartEmpty(CartEmptyException ex) {
         return GraphqlErrorBuilder.newError()
@@ -150,5 +194,6 @@ public class GlobalExceptionHandler {
                 .errorType(ErrorType.ValidationError)
                 .build();
     }
+
 
 }

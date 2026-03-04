@@ -18,17 +18,23 @@ public class MailListenerService {
     private final Optional<MailService> restSender;
     private final Optional<MailService> mockSender;
     private final Optional<MailService> resendSender;
+    private final com.tcommerce.TCommerce.application.services.common.HtmlBodyGenerator htmlBodyGenerator;
+    private final com.tcommerce.TCommerce.application.services.communication.EmailLogService emailLogService;
 
     public MailListenerService(
             @Qualifier("smtpMailSender")    Optional<MailService> smtpSender,
             @Qualifier("restApiSendgridMailSender") Optional<MailService> restSender,
             @Qualifier("mockMailSender")    Optional<MailService> mockSender,
-            @Qualifier("restApiResendMailSender") Optional<MailService> resendSender
+            @Qualifier("restApiResendMailSender") Optional<MailService> resendSender,
+            com.tcommerce.TCommerce.application.services.common.HtmlBodyGenerator htmlBodyGenerator,
+            com.tcommerce.TCommerce.application.services.communication.EmailLogService emailLogService
         ) {
         this.smtpSender = smtpSender;
         this.restSender = restSender;
         this.mockSender = mockSender;
         this.resendSender = resendSender;
+        this.htmlBodyGenerator = htmlBodyGenerator;
+        this.emailLogService = emailLogService;
     }
 
     @Async("emailTaskExecutor")
@@ -39,6 +45,10 @@ public class MailListenerService {
         try {
             MailService sender = resolveSender(event);
             sender.send(event);
+            
+            String content = htmlBodyGenerator.generateHtml(event);
+            emailLogService.logEmail(event.getTo(), event.getSubject(), content, event.getUserId());
+            
         } catch (MailSendException ex) {
             log.error("[EmailListener] Email sending failed to '{}': {}", event.getTo(), ex.getMessage());
         } catch (Exception ex) {

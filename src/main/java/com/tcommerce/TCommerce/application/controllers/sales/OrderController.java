@@ -12,9 +12,9 @@ import com.tcommerce.TCommerce.application.services.sales.OrderService;
 import com.tcommerce.TCommerce.infrastructure.security.services.UserDetailsImpl;
 import com.tcommerce.TCommerce.interfaces.dto.sales.OrderResponse;
 import com.tcommerce.TCommerce.interfaces.dto.sales.OrderWithHistory;
+import com.tcommerce.TCommerce.interfaces.dto.sales.CancelOrderRequest;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Size;
 
 import org.springframework.security.access.AccessDeniedException;
 
@@ -104,13 +104,13 @@ public class OrderController {
     public ResponseEntity<OrderWithHistory> cancelOrder(
             @AuthenticationPrincipal UserDetailsImpl userDetails, 
             @Parameter(description = "The unique identifier of the order to cancel") @PathVariable String orderId, 
-            @RequestBody @Valid @Size(min = 1, max = 255) String reason) {
+            @RequestBody @Valid CancelOrderRequest request) {
         String userId = userDetails.getId();
         Order order = orderService.getOrderById(orderId);
         if (!order.getUserId().equals(userId)) {
             throw new AccessDeniedException("You are not authorized to cancel this order");
         }
-        order = orderService.cancelOrder(order, userId, reason);
+        order = orderService.cancelOrder(order, userId, request.reason());
         return ResponseEntity.ok(order.toResponseWithHistory());
     }
     @Operation(

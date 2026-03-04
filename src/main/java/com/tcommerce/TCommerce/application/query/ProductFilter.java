@@ -4,5 +4,6 @@ public record ProductFilter(
     String name,
     String categoryId,
     Boolean isActive,
-    Boolean isDeleted
+    Boolean isDeleted,
+    String likedByUserId
 ) {}

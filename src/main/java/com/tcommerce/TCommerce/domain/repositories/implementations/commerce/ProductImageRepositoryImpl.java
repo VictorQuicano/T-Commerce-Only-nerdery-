@@ -53,6 +53,24 @@ public class ProductImageRepositoryImpl implements ProductImageRepository {
     }
 
     @Override
+    public List<ProductImage> saveAll(List<ProductImage> images) {
+        List<ProductImageEntity> entities = images.stream()
+                .map(image -> {
+                    ProductImageEntity entity = productImageMapper.toEntity(image);
+                    if (image.getProductId() != null) {
+                        entity.setProduct(jpaProductRepository.getReferenceById(image.getProductId()));
+                    }
+                    return entity;
+                })
+                .collect(Collectors.toList());
+
+        List<ProductImageEntity> savedEntities = jpaProductImageRepository.saveAll(entities);
+        return savedEntities.stream()
+                .map(productImageMapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public void deleteById(String id) {
         jpaProductImageRepository.deleteById(id);
     }
